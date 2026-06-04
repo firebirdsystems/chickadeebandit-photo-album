@@ -1,0 +1,25 @@
+{
+  "id": "photo-album",
+  "name": "Family Photos",
+  "version": "1.0.0",
+  "description": "A private shared photo gallery for the household. Upload photos, create named albums, and browse memories together. Adults can manage albums and delete; everyone can upload and browse.",
+  "entrypoint": "index.html",
+  "runtime": "static",
+  "storage": "db",
+  "category": "family",
+  "tags": ["photos", "albums", "memories", "gallery"],
+  "data_access": {
+    "reads": ["family.members"],
+    "writes": []
+  },
+  "permissions": {
+    "default_audience": "everyone",
+    "requires_approval": false
+  },
+  "resource_limits": {
+    "max_db_bytes": 52428800,
+    "max_files_bytes": 5368709120
+  },
+  "nav": { "label": "Photos" },
+  "icon": "📷"
+}

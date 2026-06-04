@@ -1,0 +1,16 @@
+{
+  "name": "chickadee-photo-album",
+  "version": "1.0.0",
+  "description": "Family photo album app for the Chickadee Bandit hub",
+  "type": "module",
+  "scripts": {
+    "build":      "node build.mjs",
+    "dev":        "node dev.mjs",
+    "test":       "vitest run",
+    "test:watch": "vitest"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}

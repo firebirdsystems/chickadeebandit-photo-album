@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Photos</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         var(--hub-bg,         #f3f4f6);
+      --surface:    var(--hub-surface,    #ffffff);
+      --border:     var(--hub-border,     #e5e7eb);
+      --text:       var(--hub-text,       #111827);
+      --muted:      var(--hub-text-muted, #6b7280);
+      --primary:    var(--hub-primary,    #3b82f6);
+      --primary-fg: var(--hub-primary-fg, #ffffff);
+      --radius:     var(--hub-radius,     8px);
+      --font:       var(--hub-font,       system-ui, sans-serif);
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    #app { max-width: 1200px; margin: 0 auto; padding: 16px; }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 18px; padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .header-title { font-size: 1.2rem; font-weight: 600; flex: 1; min-width: 0; }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+
+    .back-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--primary); font-size: 0.875rem; padding: 0;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .back-btn:hover { text-decoration: underline; }
+
+    /* ── Buttons ─────────────────────────────────────────────── */
+    .btn {
+      padding: 7px 14px; border-radius: var(--radius);
+      font: 500 0.875rem var(--font);
+      cursor: pointer; border: none;
+      display: inline-flex; align-items: center; gap: 5px;
+      transition: opacity 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary  { background: var(--primary); color: var(--primary-fg); }
+    .btn-primary:hover:not(:disabled) { opacity: 0.88; }
+    .btn-ghost    { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { background: var(--bg); }
+    .btn-danger   { background: #ef4444; color: #fff; }
+    .btn-danger:hover:not(:disabled) { opacity: 0.88; }
+    .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
+
+    /* ── Upload progress banner ──────────────────────────────── */
+    .upload-banner {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px 14px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 14px; font-size: 0.85rem;
+    }
+    .upload-bar-wrap { flex: 1; height: 4px; background: var(--bg); border-radius: 2px; overflow: hidden; }
+    .upload-bar-fill { height: 100%; background: var(--primary); transition: width 0.25s; border-radius: 2px; }
+
+    /* ── Drop overlay ─────────────────────────────────────────── */
+    .drop-overlay {
+      position: fixed; inset: 0; z-index: 800;
+      background: rgba(59,130,246,0.12);
+      border: 3px dashed var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: 600; color: var(--primary);
+      pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    }
+    .drop-overlay.active { opacity: 1; }
+
+    /* ── Albums grid ─────────────────────────────────────────── */
+    .albums-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    @media (max-width: 400px) { .albums-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+
+    .album-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+    .album-card:hover  { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.09); }
+    .album-card:active { transform: translateY(0);    box-shadow: none; }
+
+    .album-cover {
+      width: 100%; aspect-ratio: 4/3;
+      background: var(--bg); position: relative; overflow: hidden;
+    }
+    .album-cover img {
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .album-cover img.loaded { opacity: 1; }
+    .album-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #e0e7ff 0%, #fce7f3 100%);
+    }
+    .album-placeholder.all { background: linear-gradient(135deg, #d1fae5 0%, #dbeafe 100%); }
+
+    .album-info  { padding: 10px 12px; }
+    .album-name  { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .album-count { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Photos grid ─────────────────────────────────────────── */
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 4px;
+    }
+    @media (min-width: 480px)  { .photos-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px; } }
+    @media (min-width: 768px)  { .photos-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; } }
+    @media (min-width: 1024px) { .photos-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; } }
+
+    .photo-card {
+      position: relative; aspect-ratio: 1;
+      background: var(--bg); border-radius: 4px; overflow: hidden;
+      cursor: pointer; contain: layout style paint;
+    }
+    .photo-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: 0; transition: opacity 0.22s, transform 0.3s;
+      will-change: transform;
+    }
+    .photo-card img.loaded { opacity: 1; }
+    .photo-card:hover img.loaded { transform: scale(1.04); }
+
+    /* shimmer */
+    .shimmer {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, var(--bg) 25%, var(--border) 50%, var(--bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* Delete button appears on hover (adults only) */
+    .photo-del {
+      position: absolute; top: 6px; right: 6px;
+      background: rgba(0,0,0,0.55); color: #fff;
+      border: none; border-radius: 50%;
+      width: 26px; height: 26px; font-size: 13px;
+      cursor: pointer; display: none;
+      align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .photo-del:hover { background: rgba(239,68,68,0.85); }
+    .photo-card:hover .photo-del { display: flex; }
+
+    /* ── Empty / loading states ───────────────────────────────── */
+    .empty-state { text-align: center; padding: 64px 20px; color: var(--muted); }
+    .empty-icon  { font-size: 3.5rem; margin-bottom: 10px; }
+    .empty-state h3 { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .empty-state p  { font-size: 0.875rem; }
+    .empty-state .btn { margin-top: 18px; }
+
+    .loading-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 4px;
+    }
+    .loading-card {
+      aspect-ratio: 1; border-radius: 4px; overflow: hidden;
+      background: linear-gradient(90deg, var(--bg) 25%, var(--border) 50%, var(--bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+
+    /* ── Modal ───────────────────────────────────────────────── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      animation: fade-in 0.15s;
+    }
+    @keyframes fade-in { from { opacity: 0; } }
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      animation: slide-up 0.15s;
+    }
+    @keyframes slide-up { from { transform: translateY(10px); opacity: 0; } }
+    .modal h2 { font-size: 1.05rem; font-weight: 600; margin-bottom: 16px; }
+
+    .form-group { margin-bottom: 13px; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 4px; }
+    .form-group input,
+    .form-group textarea {
+      width: 100%; padding: 8px 11px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font: inherit; font-size: 0.875rem; color: var(--text);
+      background: var(--surface); transition: border-color 0.15s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { outline: none; border-color: var(--primary); }
+    .form-group textarea { resize: vertical; min-height: 72px; }
+
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
+    /* ── Lightbox ────────────────────────────────────────────── */
+    #lightbox {
+      position: fixed; inset: 0; z-index: 900;
+      background: rgba(0,0,0,0.93);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.18s;
+    }
+    #lightbox.open { opacity: 1; pointer-events: all; }
+
+    .lb-close {
+      position: absolute; top: 14px; right: 14px;
+      background: rgba(255,255,255,0.13); color: #fff;
+      border: none; border-radius: 50%;
+      width: 38px; height: 38px; font-size: 17px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: background 0.15s;
+    }
+    .lb-close:hover { background: rgba(255,255,255,0.25); }
+
+    .lb-counter {
+      position: absolute; top: 19px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.45); font-size: 0.78rem; white-space: nowrap;
+    }
+
+    .lb-stage {
+      flex: 1; width: 100%;
+      display: flex; align-items: center;
+      padding: 56px 60px 0;
+      gap: 0; position: relative;
+    }
+    @media (max-width: 600px) { .lb-stage { padding: 56px 44px 0; } }
+
+    .lb-img-wrap {
+      flex: 1; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      transform: scale(0.97);
+      transition: transform 0.18s cubic-bezier(0.4,0,0.2,1);
+    }
+    #lightbox.open .lb-img-wrap { transform: scale(1); }
+
+    #lb-img {
+      max-width: 100%; max-height: 100%;
+      object-fit: contain; border-radius: 4px;
+      will-change: opacity; transition: opacity 0.15s;
+    }
+    #lb-img.fading { opacity: 0; }
+
+    .lb-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,0.13); color: #fff;
+      border: none; border-radius: 50%;
+      width: 42px; height: 42px; font-size: 22px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: background 0.15s;
+      z-index: 1;
+    }
+    .lb-nav:hover:not(:disabled) { background: rgba(255,255,255,0.25); }
+    .lb-nav:disabled { opacity: 0.18; cursor: default; }
+    .lb-prev { left: 10px; }
+    .lb-next { right: 10px; }
+    @media (max-width: 600px) {
+      .lb-prev { left: 4px; }
+      .lb-next { right: 4px; }
+    }
+
+    .lb-footer {
+      padding: 12px 20px 16px; width: 100%; max-width: 900px;
+      flex-shrink: 0;
+    }
+    .lb-caption { font-size: 0.9rem; font-weight: 500; color: #fff; margin-bottom: 3px; }
+    .lb-meta    { font-size: 0.76rem; color: rgba(255,255,255,0.45); }
+
+    /* ── Toast ───────────────────────────────────────────────── */
+    #toasts {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 2000; display: flex; flex-direction: column; gap: 8px; align-items: center;
+      pointer-events: none;
+    }
+    .toast {
+      background: #1f2937; color: #fff;
+      padding: 9px 18px; border-radius: 6px;
+      font-size: 0.85rem; white-space: nowrap;
+      animation: toast-in 0.18s ease, toast-out 0.2s ease 2.6s forwards;
+    }
+    .toast.error { background: #b91c1c; }
+    @keyframes toast-in  { from { opacity: 0; transform: translateY(6px); } }
+    @keyframes toast-out { to   { opacity: 0; transform: translateY(6px); } }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Lightbox lives outside #app so it overlays everything -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lb-close" id="lb-close" aria-label="Close">✕</button>
+    <div class="lb-counter" id="lb-counter"></div>
+    <div class="lb-stage">
+      <button class="lb-nav lb-prev" id="lb-prev" aria-label="Previous">&#8249;</button>
+      <div class="lb-img-wrap">
+        <img id="lb-img" src="" alt="" />
+      </div>
+      <button class="lb-nav lb-next" id="lb-next" aria-label="Next">&#8250;</button>
+    </div>
+    <div class="lb-footer" id="lb-footer"></div>
+  </div>
+
+  <div class="drop-overlay" id="drop-overlay">Drop photos here</div>
+  <div id="toasts"></div>
+
+  <script type="module">
+    import {
+      createDbHelper, createFilesHelper,
+      isAdult, esc, formatRelativeDate,
+    } from "/hub-sdk.js";
+    import {
+      canDelete, canCreateAlbum, canUpload,
+      sortByDate, getCoverFileId, albumPhotoCount,
+    } from "./logic.js";
+
+    /* ─── Runtime globals ─────────────────────────────────────── */
+    const CONTEXT   = window.__CONTEXT_URL   ?? "";
+    const DB_URL    = window.__DB_URL        ?? "";
+    const FILES_URL = window.__FILES_URL     ?? "";
+    const ME        = window.__CURRENT_MEMBER ?? null;
+    const ADULT     = isAdult(ME);
+
+    const db    = DB_URL    ? createDbHelper(DB_URL)       : async () => ({ rows: [] });
+    const files = FILES_URL ? createFilesHelper(FILES_URL) : null;
+
+    /* ─── State ───────────────────────────────────────────────── */
+    let view         = "albums";  // "albums" | "album"
+    let albums       = [];
+    let photos       = [];        // photos in current view
+    let allPhotos    = [];        // all photos (used for album covers + counts)
+    let currentAlbum = null;      // null = "All Photos"
+    let lbIndex      = -1;        // lightbox index into photos[]
+    let modalEl      = null;
+    let uploading    = false;
+    let uploadDone   = 0;
+    let uploadTotal  = 0;
+
+    /* ─── Intersection Observer (lazy image loading) ──────────── */
+    const imgObserver = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const img = e.target;
+        const src = img.dataset.src;
+        if (!src) continue;
+        img.src = src;
+        img.removeAttribute("data-src");
+        imgObserver.unobserve(img);
+      }
+    }, { rootMargin: "400px 0px" });
+
+    /* ─── Data loading ────────────────────────────────────────── */
+    async function loadData() {
+      const [{ rows: alb }, { rows: pho }] = await Promise.all([
+        db("SELECT id, name, description, created_by_id, created_by_name, created_at FROM albums ORDER BY created_at DESC"),
+        db("SELECT id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at FROM photos ORDER BY uploaded_at DESC"),
+      ]);
+      albums    = alb;
+      allPhotos = pho;
+    }
+
+    async function loadPhotosForView() {
+      if (currentAlbum) {
+        photos = allPhotos.filter(p => p.album_id === currentAlbum.id);
+      } else {
+        photos = [...allPhotos];
+      }
+    }
+
+    /* ─── Render dispatch ─────────────────────────────────────── */
+    function render() {
+      if (view === "albums") renderAlbums();
+      else renderAlbum();
+    }
+
+    /* ─── Albums view ─────────────────────────────────────────── */
+    function renderAlbums() {
+      const totalCount = allPhotos.length;
+      const allCover   = allPhotos.length ? allPhotos[0].file_id : null;
+
+      let html = `
+        <div class="header">
+          <span class="header-title">📷 Family Photos</span>
+          <div class="header-actions">
+            ${canCreateAlbum(ME) ? `<button class="btn btn-primary" onclick="openCreateAlbumModal()">+ New Album</button>` : ""}
+          </div>
+        </div>
+      `;
+
+      if (uploading) html += renderUploadBanner();
+
+      if (!DB_URL) {
+        html += `<div class="empty-state">
+          <div class="empty-icon">📷</div>
+          <h3>Demo mode</h3>
+          <p>Install this app in your hub to upload and browse family photos.</p>
+        </div>`;
+        document.getElementById("app").innerHTML = html;
+        return;
+      }
+
+      html += `<div class="albums-grid">`;
+
+      // "All Photos" virtual album card
+      html += albumCardHTML({
+        id: "__all__",
+        name: "All Photos",
+        coverFileId: allCover,
+        count: totalCount,
+        isAll: true,
+      });
+
+      for (const a of albums) {
+        html += albumCardHTML({
+          id: a.id,
+          name: a.name,
+          coverFileId: getCoverFileId(allPhotos, a.id),
+          count: albumPhotoCount(allPhotos, a.id),
+          isAll: false,
+          canDel: canDelete(ME),
+        });
+      }
+
+      html += `</div>`;
+
+      if (albums.length === 0 && totalCount === 0) {
+        html += `<div class="empty-state">
+          <div class="empty-icon">📸</div>
+          <h3>No photos yet</h3>
+          <p>Create an album or drop photos anywhere on this page to get started.</p>
+        </div>`;
+      }
+
+      const app = document.getElementById("app");
+      app.innerHTML = html;
+      observeLazyImgs(app);
+    }
+
+    function albumCardHTML({ id, name, coverFileId, count, isAll, canDel }) {
+      const coverHtml = coverFileId && files
+        ? `<img data-src="${esc(files.url(coverFileId))}" alt="${esc(name)}"
+               onload="this.classList.add('loaded')" /><div class="shimmer"></div>`
+        : `<div class="album-placeholder${isAll ? " all" : ""}">${isAll ? "🖼️" : "📁"}</div>`;
+
+      const countLabel = count === 1 ? "1 photo" : `${count} photos`;
+      const delBtn = (!isAll && canDel)
+        ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px;color:#ef4444;border-color:#fecaca"
+                   onclick="event.stopPropagation(); confirmDeleteAlbum('${esc(id)}', '${esc(name)}')">Delete album</button>`
+        : "";
+
+      return `
+        <div class="album-card" data-album-id="${esc(id)}"
+             onclick="onAlbumClick(this)"
+             role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter'||event.key===' ')this.click()">
+          <div class="album-cover">${coverHtml}</div>
+          <div class="album-info">
+            <div class="album-name">${esc(name)}</div>
+            <div class="album-count">${countLabel}</div>
+            ${delBtn}
+          </div>
+        </div>`;
+    }
+
+    window.onAlbumClick = function(el) {
+      const id = el.dataset.albumId;
+      if (id === "__all__") {
+        currentAlbum = null;
+      } else {
+        currentAlbum = albums.find(a => a.id === id) ?? null;
+      }
+      view = "album";
+      loadPhotosForView();
+      render();
+    };
+
+    /* ─── Album / photo grid view ─────────────────────────────── */
+    function renderAlbum() {
+      const title   = currentAlbum ? currentAlbum.name : "All Photos";
+      const showDel = canDelete(ME);
+      const showUp  = canUpload(ME, !!FILES_URL);
+
+      let html = `
+        <div class="header">
+          <button class="back-btn" onclick="goBack()">← Albums</button>
+          <span class="header-title">${esc(title)}</span>
+          <div class="header-actions">
+            ${showUp ? `<button class="btn btn-primary" onclick="triggerFilePicker()">+ Upload</button>` : ""}
+          </div>
+        </div>
+        <input type="file" id="file-input" multiple accept="image/*"
+               style="display:none" onchange="onFileInputChange(event)" />
+      `;
+
+      if (uploading) html += renderUploadBanner();
+
+      if (photos.length === 0) {
+        html += `<div class="empty-state">
+          <div class="empty-icon">📷</div>
+          <h3>No photos yet</h3>
+          ${showUp ? `<p>Tap Upload or drop photos here to add the first one.</p>` : `<p>No photos in this album yet.</p>`}
+          ${showUp ? `<button class="btn btn-primary" onclick="triggerFilePicker()">Upload photos</button>` : ""}
+        </div>`;
+      } else {
+        html += `<div class="photos-grid" id="photos-grid">`;
+        photos.forEach((photo, idx) => {
+          const src = files ? files.url(photo.file_id) : "";
+          html += `
+            <div class="photo-card" data-idx="${idx}" onclick="openLightbox(${idx})" role="button" tabindex="0"
+                 onkeydown="if(event.key==='Enter'||event.key===' ')openLightbox(${idx})">
+              <img data-src="${esc(src)}" alt="${esc(photo.caption || "Photo")}"
+                   onload="this.classList.add('loaded')" />
+              <div class="shimmer"></div>
+              ${showDel ? `<button class="photo-del" onclick="event.stopPropagation(); confirmDeletePhoto('${esc(photo.id)}','${esc(photo.file_id)}')" aria-label="Delete photo">✕</button>` : ""}
+            </div>`;
+        });
+        html += `</div>`;
+      }
+
+      const app = document.getElementById("app");
+      app.innerHTML = html;
+      observeLazyImgs(app);
+    }
+
+    function renderUploadBanner() {
+      const pct = uploadTotal > 0 ? Math.round((uploadDone / uploadTotal) * 100) : 0;
+      return `<div class="upload-banner">
+        <span>Uploading ${uploadDone + 1} of ${uploadTotal}…</span>
+        <div class="upload-bar-wrap"><div class="upload-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }
+
+    function goBack() {
+      view = "albums";
+      currentAlbum = null;
+      render();
+    }
+    window.goBack = goBack;
+
+    /* ─── File upload ─────────────────────────────────────────── */
+    window.triggerFilePicker = function() {
+      document.getElementById("file-input")?.click();
+    };
+
+    window.onFileInputChange = function(e) {
+      const fileList = [...e.target.files];
+      e.target.value = "";
+      if (fileList.length) uploadFiles(fileList);
+    };
+
+    async function uploadFiles(fileList) {
+      if (uploading || !files || !ME) return;
+      uploading   = true;
+      uploadDone  = 0;
+      uploadTotal = fileList.length;
+      render();
+
+      for (const file of fileList) {
+        try {
+          const { id: fileId } = await files.upload(file);
+          const photoId = crypto.randomUUID();
+          const now     = new Date().toISOString();
+          await db(
+            `INSERT INTO photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [photoId, currentAlbum?.id ?? null, fileId, "", ME.id, ME.name, now, 0]
+          );
+          allPhotos.unshift({
+            id: photoId, album_id: currentAlbum?.id ?? null,
+            file_id: fileId, caption: "",
+            uploaded_by_id: ME.id, uploaded_by_name: ME.name,
+            uploaded_at: now,
+          });
+        } catch (err) {
+          const msg = err?.status === 413 ? "File too large"
+                    : err?.status === 415 ? "Unsupported file type"
+                    : err?.status === 507 ? "Storage full"
+                    : "Upload failed";
+          toast(msg, true);
+        }
+        uploadDone++;
+        if (uploading) render();
+      }
+
+      uploading = false;
+      loadPhotosForView();
+      render();
+    }
+
+    /* ─── Drag & drop ─────────────────────────────────────────── */
+    let dragCounter = 0;
+    const dropOverlay = document.getElementById("drop-overlay");
+
+    document.addEventListener("dragenter", e => {
+      if (!e.dataTransfer?.types.includes("Files")) return;
+      dragCounter++;
+      dropOverlay.classList.add("active");
+    });
+    document.addEventListener("dragleave", () => {
+      dragCounter--;
+      if (dragCounter <= 0) { dragCounter = 0; dropOverlay.classList.remove("active"); }
+    });
+    document.addEventListener("dragover", e => e.preventDefault());
+    document.addEventListener("drop", e => {
+      e.preventDefault();
+      dragCounter = 0;
+      dropOverlay.classList.remove("active");
+      if (!canUpload(ME, !!FILES_URL)) return;
+      const fileList = [...(e.dataTransfer?.files ?? [])].filter(f => f.type.startsWith("image/"));
+      if (fileList.length) uploadFiles(fileList);
+    });
+
+    /* ─── Lightbox ────────────────────────────────────────────── */
+    const lbEl    = document.getElementById("lightbox");
+    const lbImg   = document.getElementById("lb-img");
+    const lbPrev  = document.getElementById("lb-prev");
+    const lbNext  = document.getElementById("lb-next");
+    const lbInfo  = document.getElementById("lb-footer");
+    const lbCount = document.getElementById("lb-counter");
+
+    function openLightbox(idx) {
+      lbIndex = idx;
+      lbEl.classList.add("open");
+      document.body.style.overflow = "hidden";
+      setLightboxPhoto(idx);
+    }
+    window.openLightbox = openLightbox;
+
+    function closeLightbox() {
+      lbEl.classList.remove("open");
+      document.body.style.overflow = "";
+      lbIndex = -1;
+    }
+    window.closeLightbox = closeLightbox;
+
+    function setLightboxPhoto(idx) {
+      const photo = photos[idx];
+      if (!photo) return;
+
+      lbImg.classList.add("fading");
+      const src = files ? files.url(photo.file_id) : "";
+      const img = new Image();
+      img.onload = () => {
+        lbImg.src = src;
+        lbImg.alt = photo.caption || "Photo";
+        lbImg.classList.remove("fading");
+      };
+      img.src = src;
+
+      lbCount.textContent = `${idx + 1} / ${photos.length}`;
+      lbPrev.disabled = idx === 0;
+      lbNext.disabled = idx === photos.length - 1;
+
+      const when = photo.uploaded_at ? formatRelativeDate(photo.uploaded_at) : "";
+      lbInfo.innerHTML = photo.caption
+        ? `<div class="lb-caption">${esc(photo.caption)}</div>
+           <div class="lb-meta">Uploaded by ${esc(photo.uploaded_by_name)} · ${when}</div>`
+        : `<div class="lb-meta">Uploaded by ${esc(photo.uploaded_by_name)} · ${when}</div>`;
+
+      // Preload neighbors
+      const preloadIdx = [idx - 1, idx + 1];
+      for (const i of preloadIdx) {
+        if (i >= 0 && i < photos.length && files) {
+          const pre = new Image();
+          pre.src = files.url(photos[i].file_id);
+        }
+      }
+    }
+
+    function lightboxNav(delta) {
+      const next = lbIndex + delta;
+      if (next < 0 || next >= photos.length) return;
+      lbIndex = next;
+      setLightboxPhoto(next);
+    }
+    window.lightboxNav = lightboxNav;
+
+    // Keyboard nav
+    document.addEventListener("keydown", e => {
+      if (!lbEl.classList.contains("open")) return;
+      if (e.key === "ArrowLeft")  lightboxNav(-1);
+      if (e.key === "ArrowRight") lightboxNav(1);
+      if (e.key === "Escape")     closeLightbox();
+    });
+
+    // Click backdrop to close
+    lbEl.addEventListener("click", e => { if (e.target === lbEl) closeLightbox(); });
+    document.getElementById("lb-close").addEventListener("click", closeLightbox);
+    lbPrev.addEventListener("click", () => lightboxNav(-1));
+    lbNext.addEventListener("click", () => lightboxNav(1));
+
+    // Touch swipe
+    let touchX = 0;
+    lbEl.addEventListener("touchstart", e => { touchX = e.touches[0].clientX; }, { passive: true });
+    lbEl.addEventListener("touchend",   e => {
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 48) lightboxNav(dx < 0 ? 1 : -1);
+    }, { passive: true });
+
+    /* ─── Create album modal ──────────────────────────────────── */
+    function openCreateAlbumModal() {
+      openModal(`
+        <h2>New Album</h2>
+        <div class="form-group">
+          <label for="al-name">Album name</label>
+          <input id="al-name" type="text" placeholder="e.g. Summer 2025" maxlength="80" />
+        </div>
+        <div class="form-group">
+          <label for="al-desc">Description <span style="color:var(--muted)">(optional)</span></label>
+          <textarea id="al-desc" placeholder="What is this album about?"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" id="al-submit" onclick="submitCreateAlbum()">Create</button>
+        </div>
+      `);
+      setTimeout(() => document.getElementById("al-name")?.focus(), 60);
+    }
+    window.openCreateAlbumModal = openCreateAlbumModal;
+
+    window.submitCreateAlbum = async function() {
+      const nameEl = document.getElementById("al-name");
+      const name   = nameEl?.value.trim();
+      if (!name) { nameEl?.focus(); return; }
+
+      const btn = modalEl?.querySelector("#al-submit");
+      if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+
+      try {
+        const id  = crypto.randomUUID();
+        const now = new Date().toISOString();
+        await db(
+          `INSERT INTO albums (id, name, description, created_by_id, created_by_name, created_at)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [id, name, document.getElementById("al-desc")?.value.trim() ?? "", ME.id, ME.name, now]
+        );
+        albums.unshift({ id, name, description: "", created_by_id: ME.id, created_by_name: ME.name, created_at: now });
+        closeModal();
+        render();
+        toast("Album created");
+      } catch {
+        if (btn) { btn.disabled = false; btn.textContent = "Create"; }
+        toast("Failed to create album", true);
+      }
+    };
+
+    /* ─── Delete photo ────────────────────────────────────────── */
+    window.confirmDeletePhoto = function(photoId, fileId) {
+      openModal(`
+        <h2>Delete photo?</h2>
+        <p style="color:var(--muted);font-size:0.875rem;margin-bottom:20px">This cannot be undone.</p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-danger" id="del-submit"
+                  onclick="doDeletePhoto('${esc(photoId)}','${esc(fileId)}')">Delete</button>
+        </div>
+      `);
+    };
+
+    window.doDeletePhoto = async function(photoId, fileId) {
+      const btn = modalEl?.querySelector("#del-submit");
+      if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
+      try {
+        await db("DELETE FROM photos WHERE id = ?", [photoId]);
+        files?.delete(fileId).catch(() => {});
+        allPhotos = allPhotos.filter(p => p.id !== photoId);
+        loadPhotosForView();
+        closeModal();
+        if (lbEl.classList.contains("open")) closeLightbox();
+        render();
+        toast("Photo deleted");
+      } catch {
+        if (btn) { btn.disabled = false; btn.textContent = "Delete"; }
+        toast("Failed to delete photo", true);
+      }
+    };
+
+    /* ─── Delete album ────────────────────────────────────────── */
+    window.confirmDeleteAlbum = function(albumId, albumName) {
+      const count = albumPhotoCount(allPhotos, albumId);
+      const warn  = count > 0 ? ` and its ${count} photo${count > 1 ? "s" : ""}` : "";
+      openModal(`
+        <h2>Delete "${esc(albumName)}"?</h2>
+        <p style="color:var(--muted);font-size:0.875rem;margin-bottom:20px">
+          This will delete the album${warn}. This cannot be undone.
+        </p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-danger" id="delal-submit"
+                  onclick="doDeleteAlbum('${esc(albumId)}')">Delete</button>
+        </div>
+      `);
+    };
+
+    window.doDeleteAlbum = async function(albumId) {
+      const btn = modalEl?.querySelector("#delal-submit");
+      if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
+      try {
+        const albumPhotos = allPhotos.filter(p => p.album_id === albumId);
+        // Delete all photo records, then album
+        if (albumPhotos.length) {
+          const placeholders = albumPhotos.map(() => "?").join(",");
+          await db(`DELETE FROM photos WHERE id IN (${placeholders})`, albumPhotos.map(p => p.id));
+          for (const p of albumPhotos) files?.delete(p.file_id).catch(() => {});
+        }
+        await db("DELETE FROM albums WHERE id = ?", [albumId]);
+        albums    = albums.filter(a => a.id !== albumId);
+        allPhotos = allPhotos.filter(p => p.album_id !== albumId);
+        closeModal();
+        render();
+        toast("Album deleted");
+      } catch {
+        if (btn) { btn.disabled = false; btn.textContent = "Delete"; }
+        toast("Failed to delete album", true);
+      }
+    };
+
+    /* ─── Modal helpers ───────────────────────────────────────── */
+    function openModal(html) {
+      closeModal();
+      modalEl = document.createElement("div");
+      modalEl.className = "modal-backdrop";
+      modalEl.innerHTML = `<div class="modal">${html}</div>`;
+      modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
+      document.body.appendChild(modalEl);
+    }
+    function closeModal() { modalEl?.remove(); modalEl = null; }
+    window.closeModal = closeModal;
+
+    /* ─── Toast ───────────────────────────────────────────────── */
+    function toast(msg, isError = false) {
+      const el = document.createElement("div");
+      el.className = "toast" + (isError ? " error" : "");
+      el.textContent = msg;
+      document.getElementById("toasts").appendChild(el);
+      setTimeout(() => el.remove(), 2800);
+    }
+
+    /* ─── Lazy image observer helper ─────────────────────────── */
+    function observeLazyImgs(root) {
+      root.querySelectorAll("img[data-src]").forEach(img => imgObserver.observe(img));
+    }
+
+    /* ─── Init ────────────────────────────────────────────────── */
+    (async () => {
+      // Show loading skeleton while data fetches
+      document.getElementById("app").innerHTML = `
+        <div class="header">
+          <span class="header-title">📷 Family Photos</span>
+        </div>
+        <div class="loading-grid">
+          ${Array.from({ length: 8 }, () => `<div class="loading-card"></div>`).join("")}
+        </div>`;
+
+      await loadData();
+      loadPhotosForView();
+      render();
+    })();
+  </script>
+</body>
+</html>
