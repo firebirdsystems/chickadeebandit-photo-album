@@ -154,21 +154,27 @@
       background: linear-gradient(90deg, var(--bg) 25%, var(--border) 50%, var(--bg) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite linear;
+      transition: opacity 0.2s;
     }
+    img.loaded + .shimmer { opacity: 0; pointer-events: none; }
     @keyframes shimmer { to { background-position: -200% 0; } }
 
-    /* Delete button appears on hover (adults only) */
-    .photo-del {
+    /* Action buttons appear on hover */
+    .photo-actions {
       position: absolute; top: 6px; right: 6px;
+      display: none; gap: 6px; z-index: 1;
+    }
+    .photo-card:hover .photo-actions { display: flex; }
+    .photo-action-btn {
       background: rgba(0,0,0,0.55); color: #fff;
       border: none; border-radius: 50%;
       width: 26px; height: 26px; font-size: 13px;
-      cursor: pointer; display: none;
+      cursor: pointer; display: flex;
       align-items: center; justify-content: center;
       transition: background 0.15s;
     }
-    .photo-del:hover { background: rgba(239,68,68,0.85); }
-    .photo-card:hover .photo-del { display: flex; }
+    .photo-action-btn:hover { background: rgba(0,0,0,0.8); }
+    .photo-action-btn.danger:hover { background: rgba(239,68,68,0.85); }
 
     /* ── Empty / loading states ───────────────────────────────── */
     .empty-state { text-align: center; padding: 64px 20px; color: var(--muted); }
@@ -237,7 +243,7 @@
     #lightbox.open { opacity: 1; pointer-events: all; }
 
     .lb-close {
-      position: absolute; top: 14px; right: 14px;
+      position: absolute; top: 14px; right: 14px; z-index: 1;
       background: rgba(255,255,255,0.13); color: #fff;
       border: none; border-radius: 50%;
       width: 38px; height: 38px; font-size: 17px;
@@ -272,8 +278,11 @@
       max-width: 100%; max-height: 100%;
       object-fit: contain; border-radius: 4px;
       will-change: opacity; transition: opacity 0.15s;
+      cursor: zoom-in;
     }
     #lb-img.fading { opacity: 0; }
+    #lb-img.zoomed { cursor: grab; }
+    #lb-img.zoomed:active { cursor: grabbing; }
 
     .lb-nav {
       position: absolute; top: 50%; transform: translateY(-50%);
@@ -365,6 +374,9 @@
     let allPhotos    = [];        // all photos (used for album covers + counts)
     let currentAlbum = null;      // null = "All Photos"
     let lbIndex      = -1;        // lightbox index into photos[]
+    let lbZoom       = 1;
+    let lbPanX       = 0;
+    let lbPanY       = 0;
     let modalEl      = null;
     let uploading    = false;
     let uploadDone   = 0;
@@ -545,7 +557,11 @@
               <img data-src="${esc(src)}" alt="${esc(photo.caption || "Photo")}"
                    onload="this.classList.add('loaded')" />
               <div class="shimmer"></div>
-              ${showDel ? `<button class="photo-del" onclick="event.stopPropagation(); confirmDeletePhoto('${esc(photo.id)}','${esc(photo.file_id)}')" aria-label="Delete photo">✕</button>` : ""}
+              <div class="photo-actions">
+                <button class="photo-action-btn" onclick="event.stopPropagation(); zoomPhoto(${idx})" aria-label="Zoom photo" title="Zoom">🔍</button>
+                <button class="photo-action-btn" onclick="event.stopPropagation(); fullscreenPhoto(this)" aria-label="View full screen" title="Full screen">⛶</button>
+                ${showDel ? `<button class="photo-action-btn danger" onclick="event.stopPropagation(); confirmDeletePhoto('${esc(photo.id)}','${esc(photo.file_id)}')" aria-label="Delete photo" title="Delete">✕</button>` : ""}
+              </div>
             </div>`;
         });
         html += `</div>`;
@@ -660,17 +676,67 @@
     }
     window.openLightbox = openLightbox;
 
+    window.zoomPhoto = function(idx) {
+      openLightbox(idx);
+      setLightboxZoom(2.5, 0, 0, true);
+    };
+
+    window.fullscreenPhoto = function(btn) {
+      const img = btn.closest(".photo-card")?.querySelector("img");
+      if (!img) return;
+      const request = img.requestFullscreen || img.webkitRequestFullscreen;
+      if (request) request.call(img);
+    };
+
     function closeLightbox() {
       lbEl.classList.remove("open");
       document.body.style.overflow = "";
       lbIndex = -1;
+      setLightboxZoom(1);
     }
     window.closeLightbox = closeLightbox;
+
+    /* ─── Lightbox zoom / pan ─────────────────────────────────── */
+    function setLightboxZoom(zoom, panX = 0, panY = 0, animate = false) {
+      lbZoom = Math.min(Math.max(zoom, 1), 4);
+      lbPanX = lbZoom === 1 ? 0 : panX;
+      lbPanY = lbZoom === 1 ? 0 : panY;
+      lbImg.style.transition = animate ? "transform 0.2s ease, opacity 0.15s" : "opacity 0.15s";
+      lbImg.style.transform  = lbZoom === 1 ? "" : `translate(${lbPanX}px, ${lbPanY}px) scale(${lbZoom})`;
+      lbImg.classList.toggle("zoomed", lbZoom > 1);
+    }
+
+    lbImg.addEventListener("wheel", e => {
+      if (!lbEl.classList.contains("open")) return;
+      e.preventDefault();
+      setLightboxZoom(lbZoom + (e.deltaY < 0 ? 0.5 : -0.5), lbPanX, lbPanY);
+    }, { passive: false });
+
+    lbImg.addEventListener("dblclick", () => {
+      setLightboxZoom(lbZoom > 1 ? 1 : 2.5, 0, 0, true);
+    });
+
+    let lbDragging = false, lbDragStartX = 0, lbDragStartY = 0, lbPanStartX = 0, lbPanStartY = 0;
+    lbImg.addEventListener("mousedown", e => {
+      if (lbZoom <= 1) return;
+      lbDragging   = true;
+      lbDragStartX = e.clientX;
+      lbDragStartY = e.clientY;
+      lbPanStartX  = lbPanX;
+      lbPanStartY  = lbPanY;
+      e.preventDefault();
+    });
+    window.addEventListener("mousemove", e => {
+      if (!lbDragging) return;
+      setLightboxZoom(lbZoom, lbPanStartX + (e.clientX - lbDragStartX), lbPanStartY + (e.clientY - lbDragStartY));
+    });
+    window.addEventListener("mouseup", () => { lbDragging = false; });
 
     function setLightboxPhoto(idx) {
       const photo = photos[idx];
       if (!photo) return;
 
+      setLightboxZoom(1);
       lbImg.classList.add("fading");
       const src = files ? files.url(photo.file_id) : "";
       const img = new Image();
@@ -727,6 +793,7 @@
     let touchX = 0;
     lbEl.addEventListener("touchstart", e => { touchX = e.touches[0].clientX; }, { passive: true });
     lbEl.addEventListener("touchend",   e => {
+      if (lbZoom > 1) return;
       const dx = e.changedTouches[0].clientX - touchX;
       if (Math.abs(dx) > 48) lightboxNav(dx < 0 ? 1 : -1);
     }, { passive: true });
