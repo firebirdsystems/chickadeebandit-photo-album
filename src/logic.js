@@ -20,7 +20,8 @@ export function sortByDate(items, key = "uploaded_at", desc = true) {
 export function getCoverFileId(photos, albumId) {
   const pool = albumId ? photos.filter(p => p.album_id === albumId) : photos;
   if (!pool.length) return null;
-  return sortByDate(pool, "uploaded_at", true)[0].file_id;
+  const cover = sortByDate(pool, "uploaded_at", true)[0];
+  return cover.thumb_file_id || cover.file_id;
 }
 
 export function albumPhotoCount(photos, albumId) {

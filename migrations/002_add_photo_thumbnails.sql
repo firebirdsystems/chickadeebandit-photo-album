@@ -1,0 +1,1 @@
+ALTER TABLE photos ADD COLUMN IF NOT EXISTS thumb_file_id TEXT;
