@@ -159,6 +159,14 @@
     img.loaded + .shimmer { opacity: 0; pointer-events: none; }
     @keyframes shimmer { to { background-position: -200% 0; } }
 
+    /* Image failed to decode (e.g. HEIC in browsers that can't display it) */
+    img.load-error + .shimmer {
+      animation: none; opacity: 1; pointer-events: none;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    img.load-error + .shimmer::after { content: "🖼️"; font-size: 1.6rem; opacity: 0.3; }
+
     /* Action buttons appear on hover */
     .photo-actions {
       position: absolute; top: 6px; right: 6px;
@@ -488,7 +496,7 @@
     function albumCardHTML({ id, name, coverFileId, count, isAll, canDel }) {
       const coverHtml = coverFileId && files
         ? `<img data-src="${esc(files.url(coverFileId))}" alt="${esc(name)}"
-               onload="this.classList.add('loaded')" /><div class="shimmer"></div>`
+               onload="this.classList.add('loaded')" onerror="this.classList.add('load-error')" /><div class="shimmer"></div>`
         : `<div class="album-placeholder${isAll ? " all" : ""}">${isAll ? "🖼️" : "📁"}</div>`;
 
       const countLabel = count === 1 ? "1 photo" : `${count} photos`;
@@ -558,7 +566,7 @@
             <div class="photo-card" data-idx="${idx}" onclick="openLightbox(${idx})" role="button" tabindex="0"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openLightbox(${idx})">
               <img data-src="${esc(src)}" alt="${esc(photo.caption || "Photo")}"
-                   onload="this.classList.add('loaded')" />
+                   onload="this.classList.add('loaded')" onerror="this.classList.add('load-error')" />
               <div class="shimmer"></div>
               <div class="photo-actions">
                 <button class="photo-action-btn" onclick="event.stopPropagation(); zoomPhoto(${idx})" aria-label="Zoom photo" title="Zoom">🔍</button>
@@ -774,7 +782,15 @@
       if (!photo) return;
 
       setLightboxZoom(1);
+      lbImg.style.display = "";
+      lbImg.classList.remove("load-error");
       lbImg.classList.add("fading");
+
+      const caption = photo.caption ? `<div class="lb-caption">${esc(photo.caption)}</div>` : "";
+      const when    = photo.uploaded_at ? formatRelativeDate(photo.uploaded_at) : "";
+      const meta    = `<div class="lb-meta">Uploaded by ${esc(photo.uploaded_by_name)} · ${when}</div>`;
+      lbInfo.innerHTML = caption + meta;
+
       const src = files ? files.url(photo.file_id) : "";
       const img = new Image();
       img.onload = () => {
@@ -782,17 +798,19 @@
         lbImg.alt = photo.caption || "Photo";
         lbImg.classList.remove("fading");
       };
+      img.onerror = () => {
+        lbImg.classList.remove("fading");
+        lbImg.classList.add("load-error");
+        lbImg.style.display = "none";
+        lbInfo.innerHTML = caption
+          + `<div class="lb-meta" style="color:#f87171">This photo can't be displayed in this browser (unsupported format, e.g. HEIC).</div>`
+          + meta;
+      };
       img.src = src;
 
       lbCount.textContent = `${idx + 1} / ${photos.length}`;
       lbPrev.disabled = idx === 0;
       lbNext.disabled = idx === photos.length - 1;
-
-      const when = photo.uploaded_at ? formatRelativeDate(photo.uploaded_at) : "";
-      lbInfo.innerHTML = photo.caption
-        ? `<div class="lb-caption">${esc(photo.caption)}</div>
-           <div class="lb-meta">Uploaded by ${esc(photo.uploaded_by_name)} · ${when}</div>`
-        : `<div class="lb-meta">Uploaded by ${esc(photo.uploaded_by_name)} · ${when}</div>`;
 
       // Preload neighbors
       const preloadIdx = [idx - 1, idx + 1];
