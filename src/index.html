@@ -409,8 +409,8 @@
     /* ─── Data loading ────────────────────────────────────────── */
     async function loadData() {
       const [{ rows: alb }, { rows: pho }] = await Promise.all([
-        db("SELECT id, name, description, created_by_id, created_by_name, created_at FROM albums ORDER BY created_at DESC"),
-        db("SELECT id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at FROM photos ORDER BY uploaded_at DESC"),
+        db("SELECT id, name, description, created_by_id, created_by_name, created_at FROM app_photo_album__albums ORDER BY created_at DESC"),
+        db("SELECT id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at FROM app_photo_album__photos ORDER BY uploaded_at DESC"),
       ]);
       albums    = alb;
       allPhotos = pho;
@@ -658,7 +658,7 @@
           const photoId = crypto.randomUUID();
           const now     = new Date().toISOString();
           await db(
-            `INSERT INTO photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order)
+            `INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [photoId, currentAlbum?.id ?? null, fileId, thumbFileId, "", ME.id, ME.name, now, 0]
           );
@@ -887,7 +887,7 @@
         const id  = crypto.randomUUID();
         const now = new Date().toISOString();
         await db(
-          `INSERT INTO albums (id, name, description, created_by_id, created_by_name, created_at)
+          `INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at)
            VALUES (?, ?, ?, ?, ?, ?)`,
           [id, name, document.getElementById("al-desc")?.value.trim() ?? "", ME.id, ME.name, now]
         );
@@ -918,7 +918,7 @@
       const btn = modalEl?.querySelector("#del-submit");
       if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
       try {
-        await db("DELETE FROM photos WHERE id = ?", [photoId]);
+        await db("DELETE FROM app_photo_album__photos WHERE id = ?", [photoId]);
         files?.delete(fileId).catch(() => {});
         if (thumbFileId) files?.delete(thumbFileId).catch(() => {});
         allPhotos = allPhotos.filter(p => p.id !== photoId);
@@ -958,13 +958,13 @@
         // Delete all photo records, then album
         if (albumPhotos.length) {
           const placeholders = albumPhotos.map(() => "?").join(",");
-          await db(`DELETE FROM photos WHERE id IN (${placeholders})`, albumPhotos.map(p => p.id));
+          await db(`DELETE FROM app_photo_album__photos WHERE id IN (${placeholders})`, albumPhotos.map(p => p.id));
           for (const p of albumPhotos) {
             files?.delete(p.file_id).catch(() => {});
             if (p.thumb_file_id) files?.delete(p.thumb_file_id).catch(() => {});
           }
         }
-        await db("DELETE FROM albums WHERE id = ?", [albumId]);
+        await db("DELETE FROM app_photo_album__albums WHERE id = ?", [albumId]);
         albums    = albums.filter(a => a.id !== albumId);
         allPhotos = allPhotos.filter(p => p.album_id !== albumId);
         closeModal();
