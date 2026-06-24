@@ -6,6 +6,14 @@
   "entrypoint": "index.html",
   "runtime": "static",
   "storage": "db",
+  "row_policies": {
+    "app_photo_album__albums": { "kind": "adult_writable" },
+    "app_photo_album__photos": {
+      "kind": "owner_only",
+      "member_column": "uploaded_by_id",
+      "adults_bypass": true
+    }
+  },
   "category": "family",
   "tags": ["photos", "albums", "memories", "gallery"],
   "data_access": {
