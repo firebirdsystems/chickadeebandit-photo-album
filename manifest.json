@@ -1,17 +1,18 @@
 {
   "id": "photo-album",
   "name": "Family Photos",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A private shared photo gallery for the household. Upload photos, create named albums, and browse memories together. Adults can manage albums and delete; everyone can upload and browse.",
   "entrypoint": "index.html",
   "runtime": "static",
   "storage": "db",
   "row_policies": {
-    "app_photo_album__albums": { "kind": "adult_writable" },
-    "app_photo_album__photos": {
-      "kind": "owner_only",
+    "albums": { "kind": "adult_writable" },
+    "photos": {
+      "kind": "owner_or_visibility",
       "member_column": "uploaded_by_id",
-      "adults_bypass": true
+      "visibility_column": "visibility",
+      "everyone_values": ["everyone"]
     }
   },
   "category": "family",

@@ -658,8 +658,8 @@
           const photoId = crypto.randomUUID();
           const now     = new Date().toISOString();
           await db(
-            `INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'everyone')`,
             [photoId, currentAlbum?.id ?? null, fileId, thumbFileId, "", ME.id, ME.name, now, 0]
           );
           allPhotos.unshift({
