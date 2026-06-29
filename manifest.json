@@ -6,6 +6,7 @@
   "entrypoint": "index.html",
   "runtime": "static",
   "storage": "db",
+  "db_encryption": "off",
   "row_policies": {
     "albums": { "kind": "adult_writable" },
     "photos": {
