@@ -502,7 +502,8 @@
       const countLabel = count === 1 ? "1 photo" : `${count} photos`;
       const delBtn = (!isAll && canDel)
         ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px;color:#ef4444;border-color:#fecaca"
-                   onclick="event.stopPropagation(); confirmDeleteAlbum('${esc(id)}', '${esc(name)}')">Delete album</button>`
+                   data-album-id="${esc(id)}" data-album-name="${esc(name)}"
+                   onclick="event.stopPropagation(); confirmDeleteAlbum(this.dataset.albumId, this.dataset.albumName)">Delete album</button>`
         : "";
 
       return `
@@ -570,7 +571,7 @@
               <div class="shimmer"></div>
               <div class="photo-actions">
                 <button class="photo-action-btn" onclick="event.stopPropagation(); zoomPhoto(${idx})" aria-label="Zoom photo" title="Zoom">🔍</button>
-                ${showDel ? `<button class="photo-action-btn danger" onclick="event.stopPropagation(); confirmDeletePhoto('${esc(photo.id)}','${esc(photo.file_id)}','${esc(photo.thumb_file_id || "")}')" aria-label="Delete photo" title="Delete">✕</button>` : ""}
+                ${showDel ? `<button class="photo-action-btn danger" data-photo-id="${esc(photo.id)}" data-file-id="${esc(photo.file_id)}" data-thumb-id="${esc(photo.thumb_file_id || "")}" onclick="event.stopPropagation(); confirmDeletePhoto(this.dataset.photoId, this.dataset.fileId, this.dataset.thumbId)" aria-label="Delete photo" title="Delete">✕</button>` : ""}
               </div>
             </div>`;
         });
@@ -909,7 +910,8 @@
         <div class="modal-actions">
           <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
           <button class="btn btn-danger" id="del-submit"
-                  onclick="doDeletePhoto('${esc(photoId)}','${esc(fileId)}','${esc(thumbFileId || "")}')">Delete</button>
+                  data-photo-id="${esc(photoId)}" data-file-id="${esc(fileId)}" data-thumb-id="${esc(thumbFileId || "")}"
+                  onclick="doDeletePhoto(this.dataset.photoId, this.dataset.fileId, this.dataset.thumbId)">Delete</button>
         </div>
       `);
     };
@@ -945,7 +947,8 @@
         <div class="modal-actions">
           <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
           <button class="btn btn-danger" id="delal-submit"
-                  onclick="doDeleteAlbum('${esc(albumId)}')">Delete</button>
+                  data-album-id="${esc(albumId)}"
+                  onclick="doDeleteAlbum(this.dataset.albumId)">Delete</button>
         </div>
       `);
     };
