@@ -18,6 +18,7 @@
   },
   "category": "family",
   "tags": ["photos", "albums", "memories", "gallery"],
+  "contexts": ["household", "shared_space"],
   "data_access": {
     "reads": ["family.members"],
     "writes": []
