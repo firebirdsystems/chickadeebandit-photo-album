@@ -27,3 +27,12 @@ export function getCoverFileId(photos, albumId) {
 export function albumPhotoCount(photos, albumId) {
   return photos.filter(p => p.album_id === albumId).length;
 }
+
+/**
+ * Fields the in-app search matches against (see hub-sdk `searchMatch`).
+ * A photo is findable by its caption and by who uploaded it — the
+ * only text a picture carries.
+ */
+export function searchableFields(item) {
+  return [item.caption, item.uploaded_by_name];
+}

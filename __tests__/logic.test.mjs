@@ -5,7 +5,7 @@ import {
   canUpload,
   sortByDate,
   getCoverFileId,
-  albumPhotoCount,
+  albumPhotoCount, searchableFields,
 } from "../src/logic.js";
 
 describe("canDelete", () => {
@@ -76,4 +76,12 @@ describe("albumPhotoCount", () => {
   it("counts photos in a different album", () => expect(albumPhotoCount(photos, "alb2")).toBe(1));
   it("returns 0 for album with no photos", () => expect(albumPhotoCount(photos, "alb3")).toBe(0));
   it("returns 0 for empty array",          () => expect(albumPhotoCount([], "alb1")).toBe(0));
+});
+
+describe("searchableFields", () => {
+  it("matches on the caption and the uploader — the only text a photo carries", () => {
+    const fields = searchableFields({ caption: "Mia's first swim", uploaded_by_name: "Ada" });
+    expect(fields).toContain("Mia's first swim");
+    expect(fields).toContain("Ada");
+  });
 });

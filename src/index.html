@@ -335,6 +335,13 @@
     .toast.error { background: #b91c1c; }
     @keyframes toast-in  { from { opacity: 0; transform: translateY(6px); } }
     @keyframes toast-out { to   { opacity: 0; transform: translateY(6px); } }
+    .search-row { margin-bottom: 12px; }
+    .search-input {
+      width: 100%; border: 1.5px solid var(--border-mid, var(--border, #d1d5db));
+      border-radius: 8px; padding: 9px 11px; font: inherit;
+      background: var(--surface, var(--card, #fff)); color: var(--text, inherit);
+    }
+    .search-input:focus { outline: none; border-color: var(--accent, #6366f1); }
   </style>
 </head>
 <body>
@@ -361,11 +368,11 @@
   <script type="module">
     import {
       createDbHelper, createFilesHelper,
-      isAdult, esc, formatRelativeDate,
+      isAdult, esc, formatRelativeDate, searchMatch,
     } from "/hub-sdk.js";
     import {
       canDelete, canCreateAlbum, canUpload,
-      sortByDate, getCoverFileId, albumPhotoCount,
+      sortByDate, getCoverFileId, albumPhotoCount, searchableFields,
     } from "./logic.js";
 
     /* ─── Runtime globals ─────────────────────────────────────── */
@@ -384,6 +391,7 @@
     let photos       = [];        // photos in current view
     let allPhotos    = [];        // all photos (used for album covers + counts)
     let currentAlbum = null;      // null = "All Photos"
+let searchQ = "";       // in-app search (see logic.js searchableFields)
     let lbIndex      = -1;        // lightbox index into photos[]
     let lbZoom       = 1;
     let lbPanX       = 0;
@@ -423,6 +431,16 @@
         photos = [...allPhotos];
       }
     }
+
+    // renderAlbum rewrites the whole view, so put the caret back after typing.
+    document.addEventListener("input", (e) => {
+      if (e.target.id !== "search") return;
+      searchQ = e.target.value;
+      const caret = e.target.selectionStart;
+      renderAlbum();
+      const next = document.getElementById("search");
+      if (next) { next.focus(); next.setSelectionRange(caret, caret); }
+    });
 
     /* ─── Render dispatch ─────────────────────────────────────── */
     function render() {
@@ -552,7 +570,23 @@
 
       if (uploading) html += renderUploadBanner();
 
-      if (photos.length === 0) {
+      if (photos.length) {
+        html += `<div class="search-row"><input id="search" class="search-input" type="search"
+          placeholder="Search captions…" aria-label="Search captions" value="${esc(searchQ)}" /></div>`;
+      }
+
+      // The lightbox indexes into photos[], so a filtered grid has to carry each
+      // photo's ORIGINAL index or clicking a result would open the wrong picture.
+      const shown = searchQ
+        ? photos.map((p, idx) => [p, idx]).filter(([p]) => searchMatch(searchQ, searchableFields(p)))
+        : photos.map((p, idx) => [p, idx]);
+
+      if (photos.length && shown.length === 0) {
+        html += `<div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h3>No captions match "${esc(searchQ)}"</h3>
+        </div>`;
+      } else if (photos.length === 0) {
         html += `<div class="empty-state">
           <div class="empty-icon">📷</div>
           <h3>No photos yet</h3>
@@ -561,7 +595,7 @@
         </div>`;
       } else {
         html += `<div class="photos-grid" id="photos-grid">`;
-        photos.forEach((photo, idx) => {
+        shown.forEach(([photo, idx]) => {
           const src = files ? files.url(photo.thumb_file_id || photo.file_id) : "";
           html += `
             <div class="photo-card" data-idx="${idx}" onclick="openLightbox(${idx})" role="button" tabindex="0"
@@ -594,6 +628,7 @@
     function goBack() {
       view = "albums";
       currentAlbum = null;
+      searchQ = "";   // otherwise the next album opens pre-filtered
       render();
     }
     window.goBack = goBack;
