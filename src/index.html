@@ -957,16 +957,12 @@
       const btn = modalEl?.querySelector("#delal-submit");
       if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
       try {
-        const albumPhotos = allPhotos.filter(p => p.album_id === albumId);
-        // Delete all photo records, then album
-        if (albumPhotos.length) {
-          const placeholders = albumPhotos.map(() => "?").join(",");
-          await db(`DELETE FROM app_photo_album__photos WHERE id IN (${placeholders})`, albumPhotos.map(p => p.id));
-          for (const p of albumPhotos) {
-            files?.delete(p.file_id).catch(() => {});
-            if (p.thumb_file_id) files?.delete(p.thumb_file_id).catch(() => {});
-          }
-        }
+        // One statement: manifest.delete_cascades takes the album's photos with
+        // it inside the same transaction and queues both file columns for R2
+        // reclaim. Deleting the photo rows from a client-built id list could not
+        // do that — it only ever named the photos THIS tab had loaded, so a
+        // photo another member uploaded since would outlive its album, invisible
+        // to every view and billed forever.
         await db("DELETE FROM app_photo_album__albums WHERE id = ?", [albumId]);
         albums    = albums.filter(a => a.id !== albumId);
         allPhotos = allPhotos.filter(p => p.album_id !== albumId);

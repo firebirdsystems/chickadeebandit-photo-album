@@ -16,6 +16,25 @@
       "everyone_values": ["everyone"]
     }
   },
+  "delete_cascades": {
+    "albums": [
+      {
+        "table": "photos",
+        "foreign_key": "album_id",
+        "file_id_column": ["file_id", "thumb_file_id"]
+      }
+    ]
+  },
+  "member_references": {
+    "albums": {
+      "column": "created_by_id",
+      "on_removed": "keep"
+    },
+    "photos": {
+      "column": "uploaded_by_id",
+      "on_removed": "keep"
+    }
+  },
   "category": "family",
   "tags": ["photos", "albums", "memories", "gallery"],
   "contexts": ["household", "shared_space"],
@@ -29,6 +48,7 @@
   },
   "resource_limits": {
     "max_db_bytes": 52428800,
+    "max_file_bytes": 20971520,
     "max_files_bytes": 5368709120
   },
   "nav": { "label": "Photos" },
