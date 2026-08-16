@@ -955,9 +955,14 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       const btn = modalEl?.querySelector("#del-submit");
       if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
       try {
+        // Both the original and its thumbnail go with the row:
+        // `manifest.delete_file_columns` names them, so the hub reads them off
+        // the doomed row and queues the reclaim inside this DELETE's own
+        // transaction. `delete_cascades` could not do it — that key fires when
+        // the ALBUM is deleted, and this is a direct delete of the child, so
+        // this lane was still leaking through two un-awaited files.delete()
+        // calls while the album lane was covered.
         await db("DELETE FROM app_photo_album__photos WHERE id = ?", [photoId]);
-        files?.delete(fileId).catch(() => {});
-        if (thumbFileId) files?.delete(thumbFileId).catch(() => {});
         allPhotos = allPhotos.filter(p => p.id !== photoId);
         loadPhotosForView();
         closeModal();
