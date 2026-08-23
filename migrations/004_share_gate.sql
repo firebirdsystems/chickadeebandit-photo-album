@@ -1,0 +1,12 @@
+-- Per-album opt-in for the public share page's photo feed.
+--
+-- The hub evaluates this column as the shareable feed's `parent_where`: a raw
+-- SQL comparison run for an anonymous visitor, outside the decrypt path, which
+-- is why it is declared in manifest.db_plaintext_columns (the admission
+-- validator reads that list, not db_encryption).
+--
+-- Defaults to 'off' so no existing album starts publishing photos the moment
+-- this version installs. The share dialog turns it on as part of minting a
+-- link, and turning it back off blanks the feed on every live link at once
+-- without revoking any of them.
+ALTER TABLE app_photo_album__albums ADD COLUMN share_photos TEXT NOT NULL DEFAULT 'off';

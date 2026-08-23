@@ -1,7 +1,7 @@
 {
   "id": "photo-album",
   "name": "Family Photos",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A private shared photo gallery for the household. Upload photos, create named albums, and browse memories together. Adults can manage albums and delete; everyone can upload and browse.",
   "entrypoint": "index.html",
   "runtime": "static",
@@ -17,6 +17,37 @@
       "value": "value",
       "label": "photos",
       "empty_hides": true
+    }
+  },
+  "db_plaintext_columns": [
+    "share_photos"
+  ],
+  "shareable": {
+    "album": {
+      "table": "albums",
+      "title_column": "name",
+      "columns": [
+        { "column": "description", "label": "About", "format": "multiline" },
+        { "column": "created_at", "label": "Started", "format": "date" }
+      ],
+      "feed": {
+        "label": "Photos",
+        "table": "photos",
+        "fk_column": "album_id",
+        "columns": [
+          { "column": "caption", "label": "Caption", "role": "body" },
+          { "column": "uploaded_at", "label": "Added", "format": "datetime", "role": "timestamp" }
+        ],
+        "files_column": "file_id",
+        "where": [
+          { "column": "visibility", "values": ["everyone"] }
+        ],
+        "parent_where": { "column": "share_photos", "values": ["on"] },
+        "order_column": "uploaded_at",
+        "order": "oldest",
+        "max_items": 60,
+        "empty_text": "No photos are being shared from this album."
+      }
     }
   },
   "row_policies": {

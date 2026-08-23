@@ -1,0 +1,256 @@
+{
+  "scenarios": [
+    {
+      "name": "a photo that is not visible to everyone is absent from another member's album count (seeded with no file bytes, so the cover falls back to its placeholder and no image request 404s)",
+      "members": {
+        "owner": "adult",
+        "other": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, '', ?, 'Owner', datetime('now'), 'off')",
+          "params": [
+            "ui-album",
+            "Beach Trip",
+            "{{owner}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, visibility) VALUES (?, 'ui-album', '', ?, ?, 'Owner', datetime('now'), 'everyone')",
+          "params": [
+            "ui-photo-shared",
+            "Sandcastle",
+            "{{owner}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, visibility) VALUES (?, 'ui-album', '', ?, ?, 'Owner', datetime('now'), 'private')",
+          "params": [
+            "ui-photo-private",
+            "Hospital visit",
+            "{{owner}}"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "owner"
+        },
+        {
+          "action": "expectText",
+          "as": "owner",
+          "selector": "[data-testid=\"album-card\"][data-album-id=\"ui-album\"]",
+          "text": "Beach Trip"
+        },
+        {
+          "action": "expectText",
+          "as": "owner",
+          "selector": "[data-testid=\"album-card\"][data-album-id=\"ui-album\"]",
+          "text": "2 photos"
+        },
+        {
+          "action": "open",
+          "as": "other"
+        },
+        {
+          "action": "expectText",
+          "as": "other",
+          "selector": "[data-testid=\"album-card\"][data-album-id=\"ui-album\"]",
+          "text": "Beach Trip"
+        },
+        {
+          "action": "expectText",
+          "as": "other",
+          "selector": "[data-testid=\"album-card\"][data-album-id=\"ui-album\"]",
+          "text": "1 photo"
+        },
+        {
+          "action": "expectNoText",
+          "as": "other",
+          "selector": "[data-testid=\"album-card\"][data-album-id=\"ui-album\"]",
+          "text": "2 photos"
+        }
+      ]
+    },
+    {
+      "name": "only an adult can share an album, and turning the photo gate off persists across a reload",
+      "members": {
+        "parent": "adult",
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, '', ?, 'Parent', datetime('now'), 'on')",
+          "params": [
+            "ui-share-album",
+            "Reunion 2026",
+            "{{parent}}"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "parent"
+        },
+        {
+          "action": "expectCount",
+          "as": "parent",
+          "selector": "[data-testid=\"album-gate-badge\"]",
+          "count": 1
+        },
+        {
+          "action": "click",
+          "as": "parent",
+          "selector": "[data-testid=\"share-album\"][data-album-id=\"ui-share-album\"]"
+        },
+        {
+          "action": "waitFor",
+          "as": "parent",
+          "selector": "[data-testid=\"share-modal\"]"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": "[data-testid=\"share-note\"]",
+          "text": "every photo in it set to Everyone"
+        },
+        {
+          "action": "click",
+          "as": "parent",
+          "selector": "[data-testid=\"share-photos\"]"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": "[data-testid=\"share-note\"]",
+          "text": "the photos stay inside the household"
+        },
+        {
+          "action": "reload",
+          "as": "parent"
+        },
+        {
+          "action": "expectCount",
+          "as": "parent",
+          "selector": "[data-testid=\"album-gate-badge\"]",
+          "count": 0
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "text": "Reunion 2026"
+        },
+        {
+          "action": "open",
+          "as": "kid"
+        },
+        {
+          "action": "expectText",
+          "as": "kid",
+          "text": "Reunion 2026"
+        },
+        {
+          "action": "expectCount",
+          "as": "kid",
+          "selector": "[data-testid=\"share-album\"]",
+          "count": 0
+        },
+        {
+          "action": "expectCount",
+          "as": "kid",
+          "selector": "[data-testid=\"new-album\"]",
+          "count": 0
+        }
+      ]
+    },
+    {
+      "name": "an album created through the form survives a reload, and Cancel discards instead of saving",
+      "members": {
+        "member": "adult"
+      },
+      "steps": [
+        {
+          "action": "open"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"new-album\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"album-create-modal\"]"
+        },
+        {
+          "action": "fill",
+          "selector": "[data-testid=\"field-album-name\"]",
+          "value": "Summer 2026"
+        },
+        {
+          "action": "fill",
+          "selector": "[data-testid=\"field-album-description\"]",
+          "value": "Two weeks at the lake"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"album-submit\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"album-create-modal\"]",
+          "state": "detached"
+        },
+        {
+          "action": "expectText",
+          "text": "Summer 2026",
+          "selector": "[data-testid=\"albums-grid\"]"
+        },
+        {
+          "action": "reload"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"album-card\"]",
+          "count": 1
+        },
+        {
+          "action": "expectText",
+          "text": "Summer 2026",
+          "selector": "[data-testid=\"albums-grid\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"new-album\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"album-create-modal\"]"
+        },
+        {
+          "action": "fill",
+          "selector": "[data-testid=\"field-album-name\"]",
+          "value": "Discarded Draft"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"album-cancel\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"album-create-modal\"]",
+          "state": "detached"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"album-card\"]",
+          "count": 1
+        },
+        {
+          "action": "expectNoText",
+          "text": "Discarded Draft"
+        }
+      ]
+    }
+  ]
+}

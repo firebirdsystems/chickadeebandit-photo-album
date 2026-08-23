@@ -121,7 +121,35 @@
     }
     .album-placeholder.all { background: linear-gradient(135deg, #d1fae5 0%, #dbeafe 100%); }
 
-    .album-info  { padding: 10px 12px; }
+    .album-info    { padding: 10px 12px; }
+    .album-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .album-actions:not(:empty) { margin-top: 6px; }
+    .album-actions .btn { margin-top: 0 !important; }
+    .shared-badge {
+      display: inline-block; margin-left: 6px;
+      font-size: 0.7rem; font-weight: 600;
+      color: var(--primary); vertical-align: baseline;
+    }
+
+    /* ── Share modal ─────────────────────────────────────────── */
+    .share-note { font-size: 0.8rem; color: var(--muted); margin: -8px 0 12px; line-height: 1.45; }
+    .link-row {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 9px 10px; margin-bottom: 8px;
+    }
+    .link-row input {
+      width: 100%; padding: 5px 7px; font: inherit; font-size: 0.78rem;
+      border: 1px solid var(--border); border-radius: 5px;
+      background: var(--bg); color: var(--text);
+    }
+    .link-meta    { font-size: 0.73rem; color: var(--muted); margin-top: 4px; }
+    .link-actions { display: flex; gap: 6px; margin-top: 6px; }
+    .share-check  { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; margin-top: 12px; }
+    .share-expiry {
+      padding: 6px 8px; font: inherit; font-size: 0.8rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--text);
+    }
     .album-name  { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .album-count { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
 
@@ -367,11 +395,11 @@
 
   <script type="module">
     import {
-      createDbHelper, createFilesHelper,
-      isAdult, esc, formatRelativeDate, searchMatch,
+      createDbHelper, createFilesHelper, createShareHelper,
+      isAdult, esc, formatRelativeDate, searchMatch, hubAlert, hubConfirm,
     } from "/hub-sdk.js";
     import {
-      canDelete, canCreateAlbum, canUpload,
+      canDelete, canCreateAlbum, canUpload, canShare, gateAfterFailedMint,
       sortByDate, getCoverFileId, albumPhotoCount, searchableFields,
     } from "./logic.js";
 
@@ -384,6 +412,8 @@
 
     const db    = DB_URL    ? createDbHelper(DB_URL)       : async () => ({ rows: [] });
     const files = FILES_URL ? createFilesHelper(FILES_URL) : null;
+    const share = createShareHelper(
+      window.__SHARE_CREATE_URL, window.__SHARE_REVOKE_URL, window.__SHARE_LIST_URL);
 
     /* ─── State ───────────────────────────────────────────────── */
     let view         = "albums";  // "albums" | "album"
@@ -417,14 +447,17 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
     /* ─── Data loading ────────────────────────────────────────── */
     async function loadData() {
       const [{ rows: alb }, { rows: pho }] = await Promise.all([
-        db("SELECT id, name, description, created_by_id, created_by_name, created_at FROM app_photo_album__albums ORDER BY created_at DESC"),
+        db("SELECT id, name, description, created_by_id, created_by_name, created_at, share_photos FROM app_photo_album__albums ORDER BY created_at DESC"),
         db("SELECT id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at FROM app_photo_album__photos ORDER BY uploaded_at DESC"),
       ]);
       albums    = alb;
       allPhotos = pho;
     }
 
-    async function loadPhotosForView() {
+    /* Synchronous on purpose: this only re-slices state already in memory, and
+       all four callers rely on `photos` being updated before the `render()` on
+       the next line. Making it async again would break them silently. */
+    function loadPhotosForView() {
       if (currentAlbum) {
         photos = allPhotos.filter(p => p.album_id === currentAlbum.id);
       } else {
@@ -457,7 +490,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         <div class="header">
           <span class="header-title">📷 Family Photos</span>
           <div class="header-actions">
-            ${canCreateAlbum(ME) ? `<button class="btn btn-primary" onclick="openCreateAlbumModal()">+ New Album</button>` : ""}
+            ${canCreateAlbum(ME) ? `<button class="btn btn-primary" data-testid="new-album" onclick="openCreateAlbumModal()">+ New Album</button>` : ""}
           </div>
         </div>
       `;
@@ -474,7 +507,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         return;
       }
 
-      html += `<div class="albums-grid">`;
+      html += `<div class="albums-grid" data-testid="albums-grid">`;
 
       // "All Photos" virtual album card
       html += albumCardHTML({
@@ -493,6 +526,8 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
           count: albumPhotoCount(allPhotos, a.id),
           isAll: false,
           canDel: canDelete(ME),
+          canShare: canShare(ME, share.enabled),
+          shared: a.share_photos === "on",
         });
       }
 
@@ -511,13 +546,29 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       observeLazyImgs(app);
     }
 
-    function albumCardHTML({ id, name, coverFileId, count, isAll, canDel }) {
+    function albumCardHTML({ id, name, coverFileId, count, isAll, canDel, canShare: showShare, shared }) {
       const coverHtml = coverFileId && files
         ? `<img data-src="${esc(files.url(coverFileId))}" alt="${esc(name)}"
                onload="this.classList.add('loaded')" onerror="this.classList.add('load-error')" /><div class="shimmer"></div>`
         : `<div class="album-placeholder${isAll ? " all" : ""}">${isAll ? "🖼️" : "📁"}</div>`;
 
       const countLabel = count === 1 ? "1 photo" : `${count} photos`;
+      // Names the GATE, not reachability. `share_photos` says "include the
+      // photos when this album is shared" and stays on after every link expires
+      // or is revoked, so a badge reading "shared" would claim a live public URL
+      // long after the last one died — and a badge that cries wolf stops being
+      // read. Liveness is not knowable here either: the link list is adult-only
+      // and paginated, so absence of a link on page one does not prove absence.
+      // The Share dialog is the authoritative view of what is actually live.
+      const gateBadge = (!isAll && shared)
+        ? `<span class="shared-badge" data-testid="album-gate-badge"
+                 title="Photos are included when this album is shared. Open Share to see whether any link is live.">🔗 photo sharing on</span>`
+        : "";
+      const shareBtn = (!isAll && showShare)
+        ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px"
+                   data-testid="share-album" data-album-id="${esc(id)}"
+                   onclick="event.stopPropagation(); openShareModal(this.dataset.albumId)">🔗 Share</button>`
+        : "";
       const delBtn = (!isAll && canDel)
         ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px;color:#ef4444;border-color:#fecaca"
                    data-album-id="${esc(id)}" data-album-name="${esc(name)}"
@@ -525,15 +576,15 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         : "";
 
       return `
-        <div class="album-card" data-album-id="${esc(id)}"
+        <div class="album-card" data-testid="${isAll ? "album-card-all" : "album-card"}" data-album-id="${esc(id)}"
              onclick="onAlbumClick(this)"
              role="button" tabindex="0"
              onkeydown="if(event.key==='Enter'||event.key===' ')this.click()">
           <div class="album-cover">${coverHtml}</div>
           <div class="album-info">
             <div class="album-name">${esc(name)}</div>
-            <div class="album-count">${countLabel}</div>
-            ${delBtn}
+            <div class="album-count">${countLabel}${gateBadge}</div>
+            <div class="album-actions">${shareBtn}${delBtn}</div>
           </div>
         </div>`;
     }
@@ -555,12 +606,16 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       const title   = currentAlbum ? currentAlbum.name : "All Photos";
       const showDel = canDelete(ME);
       const showUp  = canUpload(ME, !!FILES_URL);
+      // "All Photos" is a view, not a row — there is nothing for a link to point at.
+      const showShare = !!currentAlbum && canShare(ME, share.enabled);
 
       let html = `
         <div class="header">
           <button class="back-btn" onclick="goBack()">← Albums</button>
           <span class="header-title">${esc(title)}</span>
           <div class="header-actions">
+            ${showShare ? `<button class="btn btn-ghost" data-testid="share-album-current" data-album-id="${esc(currentAlbum.id)}"
+                                   onclick="openShareModal(this.dataset.albumId)">🔗 Share</button>` : ""}
             ${showUp ? `<button class="btn btn-primary" onclick="triggerFilePicker()">+ Upload</button>` : ""}
           </div>
         </div>
@@ -594,11 +649,11 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
           ${showUp ? `<button class="btn btn-primary" onclick="triggerFilePicker()">Upload photos</button>` : ""}
         </div>`;
       } else {
-        html += `<div class="photos-grid" id="photos-grid">`;
+        html += `<div class="photos-grid" id="photos-grid" data-testid="photos-grid">`;
         shown.forEach(([photo, idx]) => {
           const src = files ? files.url(photo.thumb_file_id || photo.file_id) : "";
           html += `
-            <div class="photo-card" data-idx="${idx}" onclick="openLightbox(${idx})" role="button" tabindex="0"
+            <div class="photo-card" data-testid="photo-card" data-photo-id="${esc(photo.id)}" data-idx="${idx}" onclick="openLightbox(${idx})" role="button" tabindex="0"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openLightbox(${idx})">
               <img data-src="${esc(src)}" alt="${esc(photo.caption || "Photo")}"
                    onload="this.classList.add('loaded')" onerror="this.classList.add('load-error')" />
@@ -896,17 +951,17 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         <h2>New Album</h2>
         <div class="form-group">
           <label for="al-name">Album name</label>
-          <input id="al-name" type="text" placeholder="e.g. Summer 2025" maxlength="80" />
+          <input id="al-name" data-testid="field-album-name" type="text" placeholder="e.g. Summer 2025" maxlength="80" />
         </div>
         <div class="form-group">
           <label for="al-desc">Description <span style="color:var(--muted)">(optional)</span></label>
-          <textarea id="al-desc" placeholder="What is this album about?"></textarea>
+          <textarea id="al-desc" data-testid="field-album-description" placeholder="What is this album about?"></textarea>
         </div>
         <div class="modal-actions">
-          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-          <button class="btn btn-primary" id="al-submit" onclick="submitCreateAlbum()">Create</button>
+          <button class="btn btn-ghost" data-testid="album-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" id="al-submit" data-testid="album-submit" onclick="submitCreateAlbum()">Create</button>
         </div>
-      `);
+      `, "album-create-modal");
       setTimeout(() => document.getElementById("al-name")?.focus(), 60);
     }
     window.openCreateAlbumModal = openCreateAlbumModal;
@@ -922,12 +977,21 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       try {
         const id  = crypto.randomUUID();
         const now = new Date().toISOString();
+        const description = document.getElementById("al-desc")?.value.trim() ?? "";
         await db(
           `INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at)
            VALUES (?, ?, ?, ?, ?, ?)`,
-          [id, name, document.getElementById("al-desc")?.value.trim() ?? "", ME.id, ME.name, now]
+          [id, name, description, ME.id, ME.name, now]
         );
-        albums.unshift({ id, name, description: "", created_by_id: ME.id, created_by_name: ME.name, created_at: now });
+        // Mirror what was actually written. The old literal "" dropped the
+        // description until the next reload — harmless while nothing rendered
+        // it, but `description` is a projected column on the public share page.
+        // `share_photos` is stated rather than left undefined so the gate reads
+        // as closed from the same source of truth the DB default sets.
+        albums.unshift({
+          id, name, description, share_photos: "off",
+          created_by_id: ME.id, created_by_name: ME.name, created_at: now,
+        });
         closeModal();
         render();
         toast("Album created");
@@ -1015,17 +1079,273 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       }
     };
 
+    /* ─── Share links ─────────────────────────────────────────── */
+    /* The hub renders the public page from `manifest.shareable.album`: the
+       album's name, description and start date, plus a feed of its photos.
+       Two gates stand between an album and a visitor — the album's own
+       `share_photos` flag (the feed's parent_where) and each photo's
+       `visibility` (the feed's where) — so a photo kept off "everyone" never
+       leaves the household even on a shared album. Uploader names are
+       deliberately NOT projected. */
+    let shareLinks    = [];
+    let shareEntitled = false;
+
+    function activeLinksFor(albumId) {
+      const now = Date.now();
+      return shareLinks.filter(l =>
+        l.itemId === albumId && !l.revokedAt && new Date(l.expiresAt).getTime() > now);
+    }
+
+    function sharePhotosOn(album) { return album?.share_photos === "on"; }
+
+    async function renderShareModal(albumId) {
+      const album = albums.find(a => a.id === albumId);
+      if (!album) return;
+
+      const status  = await share.status();
+      shareLinks    = status.links;
+      shareEntitled = status.entitled;
+      const active  = activeLinksFor(albumId);
+
+      const rows = active.map(l => `
+        <div class="link-row" data-testid="share-link-row">
+          <input readonly value="${esc(l.url)}" onclick="this.select()" />
+          <div class="link-meta">
+            Expires ${esc(new Date(l.expiresAt).toLocaleDateString())} ·
+            ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${l.hasPassword ? " · 🔒 password" : ""}
+          </div>
+          <div class="link-actions">
+            <button class="btn btn-ghost btn-sm" data-link-id="${esc(l.id)}"
+                    onclick="copyShare(this.dataset.linkId)">Copy</button>
+            <button class="btn btn-ghost btn-sm" data-link-id="${esc(l.id)}" data-album-id="${esc(albumId)}"
+                    onclick="revokeShare(this.dataset.linkId, this.dataset.albumId)">Revoke</button>
+          </div>
+        </div>`).join("");
+
+      // Reflects the stored gate, except on an album nothing points at yet:
+      // there the dialog proposes the obvious choice, and Create is what
+      // persists it. The column itself stays 'off' until someone acts.
+      const checked = sharePhotosOn(album) || active.length === 0;
+
+      openModal(`
+        <h2>Share "${esc(album.name)}"</h2>
+        <p class="share-note" id="share-note" data-testid="share-note">${esc(shareNote(checked))}</p>
+        ${rows || `<p class="share-note">No active links yet.</p>`}
+        <label class="share-check">
+          <input type="checkbox" id="share-photos" data-testid="share-photos" ${checked ? "checked" : ""}
+                 data-album-id="${esc(albumId)}"
+                 onchange="setSharePhotos(this.dataset.albumId, this.checked)" />
+          Show this album's photos to visitors
+        </label>
+        ${shareEntitled ? `
+          <div class="form-group" style="margin-top:10px">
+            <input id="share-password" type="text" autocomplete="off"
+                   placeholder="Optional password (min 6 characters)" />
+          </div>` : ""}
+        <div class="modal-actions" style="justify-content:space-between">
+          <select id="share-expiry" data-testid="share-expiry" class="share-expiry">
+            <option value="24">1 day</option>
+            <option value="168" selected>7 days</option>
+            <option value="720">30 days</option>
+            ${shareEntitled ? `<option value="8760">1 year</option>` : ""}
+          </select>
+          <span style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+            <button class="btn btn-primary" id="share-create" data-testid="share-create"
+                    data-album-id="${esc(albumId)}"
+                    onclick="createShare(this.dataset.albumId)">Create link</button>
+          </span>
+        </div>
+      `, "share-modal");
+    }
+    /* The buttons' entry point. `renderShareModal` reads the link list before it
+       renders anything, so a rejected `share.status()` leaves NO dialog and no
+       message — an inline onclick discards the rejection. Offer the retry here
+       rather than swallowing it; the internal callers keep their own handling,
+       which is not interchangeable with this one. */
+    window.openShareModal = async function(albumId) {
+      for (;;) {
+        try {
+          await renderShareModal(albumId);
+          return;
+        } catch {
+          const again = await hubConfirm("Couldn't open sharing", {
+            description: "This album's share links couldn't be loaded. Check your connection and try again.",
+            confirmLabel: "Try again",
+          });
+          if (!again) return;
+        }
+      }
+    };
+
+    function shareNote(photosShown) {
+      return photosShown
+        ? "Anyone with the link sees the album name, its description, and every photo in it set to Everyone. No account needed, and links expire on their own."
+        : "Anyone with the link sees the album name and description only — the photos stay inside the household.";
+    }
+
+    /** Persist the album's public-photo gate. One column, so turning it off
+     *  blanks the feed on every live link at once.
+     *
+     *  THROWS on failure. Every caller here is deciding what an anonymous
+     *  visitor may see, so a swallowed error would leave the UI claiming a
+     *  privacy state the database never took — and `createShare` would go on
+     *  to mint a link against the old value. */
+    async function writeSharePhotos(albumId, value) {
+      await db("UPDATE app_photo_album__albums SET share_photos = ? WHERE id = ?", [value, albumId]);
+      const album = albums.find(a => a.id === albumId);
+      if (album) album.share_photos = value;
+      const note = modalEl?.querySelector("#share-note");
+      if (note) note.textContent = shareNote(value === "on");
+    }
+
+    /** The checkbox's own handler: report the failure and put the control back
+     *  to what is actually stored. */
+    window.setSharePhotos = async function(albumId, checked) {
+      try {
+        await writeSharePhotos(albumId, checked ? "on" : "off");
+      } catch {
+        const box = modalEl?.querySelector("#share-photos");
+        if (box) box.checked = sharePhotosOn(albums.find(a => a.id === albumId));
+        toast("Couldn't change photo sharing", true);
+      }
+    };
+
+    window.createShare = async function(albumId) {
+      const album = albums.find(a => a.id === albumId);
+      const hours = Number(modalEl?.querySelector("#share-expiry")?.value) || undefined;
+      const password = modalEl?.querySelector("#share-password")?.value?.trim() || undefined;
+      const wantPhotos = !!modalEl?.querySelector("#share-photos")?.checked;
+      const btn = modalEl?.querySelector("#share-create");
+      const restore = () => { if (btn) { btn.disabled = false; btn.textContent = "Create link"; } };
+      if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+
+      // The gate goes in before the link: a link that resolved ahead of the
+      // flag would publish photos the dialog had not committed to publishing.
+      // If that write fails the mint is ABANDONED — carrying on would hand out
+      // a URL governed by the value the visitor's checkbox just rejected.
+      const wasOn = sharePhotosOn(album);
+      const flipped = wantPhotos !== wasOn;
+      if (flipped) {
+        try {
+          await writeSharePhotos(albumId, wantPhotos ? "on" : "off");
+        } catch {
+          restore();
+          const box = modalEl?.querySelector("#share-photos");
+          if (box) box.checked = wasOn;
+          hubAlert("Couldn't create share link", {
+            description: "The album's photo-sharing setting could not be saved, so no link was created. Try again.",
+          });
+          return;
+        }
+      }
+
+      // ONLY the mint is inside this try. Everything after it — the clipboard
+      // copy, the dialog refresh, the re-render — runs against a link that now
+      // exists, and none of it may reach the rollback below. `renderShareModal`
+      // in particular calls `share.status()`, whose fetch rejects on a network
+      // blip: rolling back on that would flip the gate under a LIVE link,
+      // re-publishing photos the visitor's checkbox had just switched off.
+      let link;
+      try {
+        link = await share.create("album", albumId, {
+          expiresInHours: hours, label: album?.name, password,
+        });
+      } catch (err) {
+        restore();
+        // A rejected mint does NOT mean no link exists — the connection can
+        // drop after the server commits the row. `gateAfterFailedMint` resolves
+        // that ambiguity toward the closed state instead of restoring what was
+        // there: a blind restore would put the gate back to "on" for someone
+        // who had just switched it OFF, re-publishing the album's photos
+        // through a link that may well have been minted.
+        const settle = gateAfterFailedMint(wasOn, wantPhotos);
+        if (settle) {
+          try { await writeSharePhotos(albumId, settle); }
+          catch { toast("Photo sharing is still on for this album", true); }
+        }
+        const box = modalEl?.querySelector("#share-photos");
+        if (box) box.checked = sharePhotosOn(albums.find(a => a.id === albumId));
+        render();
+        hubAlert("Couldn't create share link", {
+          description: flipped
+            ? `${err.message} Photo sharing is off for this album — if a link was created before the connection dropped, reopen Share to see it.`
+            : err.message,
+        });
+        return;
+      }
+
+      // Past this point the link is live and the gate stands as chosen.
+      try { await navigator.clipboard.writeText(link.url); toast("Link copied"); } catch { /* the list shows it */ }
+      try {
+        await renderShareModal(albumId);
+      } catch {
+        // The link exists — say so rather than reporting a failure that did
+        // not happen. Reopening Share re-reads the list.
+        restore();
+        hubAlert("The link was created", {
+          description: "It couldn't be listed just now — reopen Share to see it.",
+        });
+      }
+      render();
+    };
+
+    window.copyShare = async function(linkId) {
+      const link = shareLinks.find(l => l.id === linkId);
+      if (!link) return;
+      try { await navigator.clipboard.writeText(link.url); toast("Link copied"); }
+      catch { toast("Couldn't copy — select the link and copy it manually", true); }
+    };
+
+    window.revokeShare = async function(linkId, albumId) {
+      if (!await hubConfirm("Revoke this link?", {
+        description: "Anyone using it loses access immediately.",
+        confirmLabel: "Revoke",
+      })) return;
+      // Same split as createShare: only the revoke itself may report failure.
+      // Access is gone the moment it resolves, and a refresh that fails after
+      // that would otherwise tell the household a live link still exists.
+      try {
+        await share.revoke(linkId);
+      } catch (err) {
+        hubAlert("Couldn't revoke link", { description: err.message });
+        return;
+      }
+
+      shareLinks = shareLinks.filter(l => l.id !== linkId);
+      try {
+        await renderShareModal(albumId);
+      } catch {
+        // The dialog on screen still lists the revoked link, and it can't be
+        // re-read right now — close it rather than leave a stale list standing.
+        closeModal();
+        toast("Link revoked");
+      }
+    };
+
     /* ─── Modal helpers ───────────────────────────────────────── */
-    function openModal(html) {
+    // `testid` names the dialog for the UI-scenario runner (ui-scenarios.json),
+    // so a scenario waits on the specific modal it opened, not any modal.
+    function openModal(html, testid = "modal") {
       closeModal();
       modalEl = document.createElement("div");
       modalEl.className = "modal-backdrop";
-      modalEl.innerHTML = `<div class="modal">${html}</div>`;
+      modalEl.innerHTML = `<div class="modal" data-testid="${testid}">${html}</div>`;
       modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
       document.body.appendChild(modalEl);
     }
     function closeModal() { modalEl?.remove(); modalEl = null; }
     window.closeModal = closeModal;
+
+    /* ─── Last-resort failure surface ─────────────────────────── */
+    /* Inline `onclick="doThing()"` discards the promise `doThing` returns, so a
+       rejection anywhere in an async handler is invisible: no dialog, no
+       message, nothing to retry. Handlers still catch what they can act on;
+       this catches what nobody did. Deliberately NOT preventDefault() — the
+       console error is what the e2e error collector and any bug report need. */
+    window.addEventListener("unhandledrejection", () => {
+      toast("Something went wrong — please try again", true);
+    });
 
     /* ─── Toast ───────────────────────────────────────────────── */
     function toast(msg, isError = false) {

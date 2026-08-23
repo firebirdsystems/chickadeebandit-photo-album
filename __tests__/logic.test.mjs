@@ -5,7 +5,7 @@ import {
   canUpload,
   sortByDate,
   getCoverFileId,
-  albumPhotoCount, searchableFields,
+  albumPhotoCount, searchableFields, canShare, gateAfterFailedMint,
 } from "../src/logic.js";
 
 describe("canDelete", () => {
@@ -21,6 +21,43 @@ describe("canCreateAlbum", () => {
   it("allows admins",   () => expect(canCreateAlbum({ role: "admin" })).toBe(true));
   it("blocks children", () => expect(canCreateAlbum({ role: "child" })).toBe(false));
   it("blocks null",     () => expect(canCreateAlbum(null)).toBe(false));
+});
+
+describe("canShare", () => {
+  it("allows adults",   () => expect(canShare({ role: "adult" }, true)).toBe(true));
+  it("allows admins",   () => expect(canShare({ role: "admin" }, true)).toBe(true));
+  // Minting a link is an adult act on both hub gates it fronts: the share
+  // item's default mint_roles, and the adult_writable policy on albums that
+  // the share_photos flag is written through.
+  it("blocks children", () => expect(canShare({ role: "child" }, true)).toBe(false));
+  it("blocks null",     () => expect(canShare(null, true)).toBe(false));
+  // The hub injects no share URLs unless the manifest declares `shareable`,
+  // so an older hub hides the button rather than offering a dead one.
+  it("blocks when the hub offers no sharing", () => expect(canShare({ role: "adult" }, false)).toBe(false));
+});
+
+describe("gateAfterFailedMint", () => {
+  // A rejected mint does not prove the server did not commit the link row, so
+  // every ambiguous case has to end with the gate CLOSED.
+  it("closes a gate that was just opened", () => {
+    expect(gateAfterFailedMint(false, true)).toBe("off");
+  });
+  it("leaves a gate the user closed alone", () => {
+    // The bug this encodes against: restoring "on" here re-publishes the
+    // album's photos through a link that may well have been minted.
+    expect(gateAfterFailedMint(true, false)).toBe(null);
+  });
+  it("does nothing when the gate was never flipped", () => {
+    expect(gateAfterFailedMint(true, true)).toBe(null);
+    expect(gateAfterFailedMint(false, false)).toBe(null);
+  });
+  it("never resolves to \"on\"", () => {
+    for (const wasOn of [true, false]) {
+      for (const wantOn of [true, false]) {
+        expect(gateAfterFailedMint(wasOn, wantOn)).not.toBe("on");
+      }
+    }
+  });
 });
 
 describe("canUpload", () => {

@@ -17,74 +17,12 @@
  * The hub rejects the bundle at publish time. This test is the same check where
  * it is cheap to fix.
  */
-import { readFileSync, readdirSync } from "fs";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
 import { describe, it, expect } from "vitest";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const manifest = JSON.parse(readFileSync(join(__dirname, "../manifest.json"), "utf-8"));
-const prefix = `app_${manifest.id.replaceAll("-", "_")}__`;
-
-const migrationsDir = join(__dirname, "../migrations");
-const schema = readdirSync(migrationsDir)
-  .filter((f) => f.endsWith(".sql"))
-  .sort()
-  .map((f) => readFileSync(join(migrationsDir, f), "utf-8"))
-  .join("\n");
+import { manifest, prefix, appTableColumns } from "./schema.mjs";
 
 /** Scalar hub-file-id columns. List columns (`*_file_ids`) are a different
  *  lane — the reclaim engine reads raw SQL and cannot parse a JSON array. */
 const FILE_ID_COLUMN_RE = /^(?:file_id|file_key|photo_id|[a-z0-9_]*_file_id|[a-z0-9_]*_photo_id|[a-z0-9_]*_image_id)$/;
-
-function createTableBody(table) {
-  const head = new RegExp(`create\\s+table\\s+if\\s+not\\s+exists\\s+["\\[]?${table}["\\]]?\\s*\\(`, "i");
-  const m = head.exec(schema);
-  if (!m) return null;
-  let depth = 1;
-  let i = m.index + m[0].length;
-  const start = i;
-  while (i < schema.length && depth > 0) {
-    if (schema[i] === "(") depth++;
-    else if (schema[i] === ")") depth--;
-    i++;
-  }
-  return schema.slice(start, i - 1);
-}
-
-function columnNames(body) {
-  const segments = [];
-  let depth = 0;
-  let current = "";
-  for (const ch of body) {
-    if (ch === "(") depth++;
-    else if (ch === ")") depth--;
-    if (ch === "," && depth === 0) { segments.push(current); current = ""; } else current += ch;
-  }
-  segments.push(current);
-  const constraints = new Set(["primary", "unique", "check", "foreign", "constraint"]);
-  return segments
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map((s) => s.split(/\s+/)[0].replace(/^["[`]|["\]`]$/g, ""))
-    .filter((name) => !constraints.has(name.toLowerCase()));
-}
-
-/** Every app table's columns: CREATE TABLE bodies plus appended ALTER TABLE ADD
- *  COLUMN statements. Both checks below need the ALTERs — several apps add
- *  their file column in a later migration. */
-function appTableColumns() {
-  const tables = new Map();
-  for (const m of schema.matchAll(/create\s+table\s+if\s+not\s+exists\s+["\[]?([A-Za-z0-9_]+)["\]]?\s*\(/gi)) {
-    if (!m[1].startsWith(prefix)) continue;
-    const body = createTableBody(m[1]);
-    if (body) tables.set(m[1], new Set(columnNames(body)));
-  }
-  for (const m of schema.matchAll(/alter\s+table\s+["\[]?([A-Za-z0-9_]+)["\]]?\s+add\s+column\s+["\[]?([A-Za-z0-9_]+)["\]]?/gi)) {
-    tables.get(m[1])?.add(m[2]);
-  }
-  return tables;
-}
 
 /** [unprefixedTable, column] for every scalar file column in the schema. */
 function schemaFileColumns() {
