@@ -7,18 +7,6 @@
   "runtime": "static",
   "storage": "db",
   "db_encryption": "off",
-  "glance": {
-    "source": {
-      "kind": "sql",
-      "query": "SELECT COUNT(*) AS value FROM app_photo_album__photos LIMIT 1"
-    },
-    "display": {
-      "template": "stat",
-      "value": "value",
-      "label": "photos",
-      "empty_hides": true
-    }
-  },
   "db_plaintext_columns": [
     "share_photos"
   ],
