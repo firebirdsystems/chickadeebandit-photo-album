@@ -6,6 +6,10 @@
   "entrypoint": "index.html",
   "runtime": "static",
   "storage": "db",
+  "preload": {
+    "albums": {"sql": "SELECT id, name, description, created_by_id, created_by_name, created_at, share_photos FROM app_photo_album__albums ORDER BY created_at DESC"},
+    "photos": {"sql": "SELECT id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at FROM app_photo_album__photos ORDER BY uploaded_at DESC"}
+  },
   "db_encryption": "off",
   "db_plaintext_columns": [
     "share_photos"
