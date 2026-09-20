@@ -1,5 +1,7 @@
 # Family Photos
 
+A [Chickadee Bandit](https://chickadeebandit.com/app-library/photo-album) app.
+
 A private shared photo gallery for the Chickadee Bandit hub.
 
 ## Features
