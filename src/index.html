@@ -394,10 +394,7 @@
   <div id="toasts"></div>
 
   <script type="module">
-    import {
-      createDbHelper, createFilesHelper, createShareHelper,
-      isAdult, esc, formatRelativeDate, searchMatch, hubAlert, hubConfirm,
-    } from "/hub-sdk.js";
+    import { createDbHelper, createFilesHelper, createShareHelper, isAdult, esc, formatRelativeDate, searchMatch, hubAlert, hubConfirm, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS } from "/hub-sdk.js";
     import {
       canDelete, canCreateAlbum, canUpload, canShare, gateAfterFailedMint,
       sortByDate, getCoverFileId, albumPhotoCount, searchableFields,
@@ -1092,8 +1089,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
 
     function activeLinksFor(albumId) {
       const now = Date.now();
-      return shareLinks.filter(l =>
-        l.itemId === albumId && !l.revokedAt && new Date(l.expiresAt).getTime() > now);
+      return activeShareLinks(shareLinks, albumId);
     }
 
     function sharePhotosOn(album) { return album?.share_photos === "on"; }
@@ -1102,7 +1098,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       const album = albums.find(a => a.id === albumId);
       if (!album) return;
 
-      const status  = await share.status();
+      const status  = await share.listAll();
       shareLinks    = status.links;
       shareEntitled = status.entitled;
       const active  = activeLinksFor(albumId);
@@ -1144,9 +1140,8 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
           </div>` : ""}
         <div class="modal-actions" style="justify-content:space-between">
           <select id="share-expiry" data-testid="share-expiry" class="share-expiry">
-            <option value="24">1 day</option>
-            <option value="168" selected>7 days</option>
-            <option value="720">30 days</option>
+            ${SHARE_EXPIRY_CHOICES.map(({ hours, label }) =>
+              `<option value="${hours}"${hours === DEFAULT_SHARE_EXPIRY_HOURS ? " selected" : ""}>${label}</option>`).join("")}
             ${shareEntitled ? `<option value="8760">1 year</option>` : ""}
           </select>
           <span style="display:flex;gap:8px">
@@ -1159,7 +1154,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       `, "share-modal");
     }
     /* The buttons' entry point. `renderShareModal` reads the link list before it
-       renders anything, so a rejected `share.status()` leaves NO dialog and no
+       renders anything, so a rejected `share.listAll()` leaves NO dialog and no
        message — an inline onclick discards the rejection. Offer the retry here
        rather than swallowing it; the internal callers keep their own handling,
        which is not interchangeable with this one. */
@@ -1243,7 +1238,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       // ONLY the mint is inside this try. Everything after it — the clipboard
       // copy, the dialog refresh, the re-render — runs against a link that now
       // exists, and none of it may reach the rollback below. `renderShareModal`
-      // in particular calls `share.status()`, whose fetch rejects on a network
+      // in particular calls `share.listAll()`, whose fetch rejects on a network
       // blip: rolling back on that would flip the gate under a LIVE link,
       // re-publishing photos the visitor's checkbox had just switched off.
       let link;
