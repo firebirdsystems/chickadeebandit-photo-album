@@ -1,0 +1,166 @@
+{
+  "scenarios": [
+    {
+      "name": "albums are adult-managed: a child can browse but not create, rename, share or delete one",
+      "members": { "parent": "adult", "kid": "child" },
+      "steps": [
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+          "params": ["a1", "Summer 2025", "Beach trip", "{{parent}}", "Parent", "2026-01-01T00:00:00Z"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id, name FROM app_photo_album__albums",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "a1", "name": "Summer 2025" }] }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+          "params": ["a2", "Kid album", "", "{{kid}}", "Kid", "2026-01-02T00:00:00Z"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "UPDATE app_photo_album__albums SET share_photos = ? WHERE id = ?",
+          "params": ["on", "a1"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "DELETE FROM app_photo_album__albums WHERE id = ?",
+          "params": ["a1"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT id FROM app_photo_album__albums WHERE share_photos = 'off'",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "a1" }] }
+        }
+      ]
+    },
+    {
+      "name": "everyone can upload and browse photos; a child cannot delete another member's photo but an adult can",
+      "members": { "parent": "adult", "kid": "child", "sibling": "child" },
+      "steps": [
+        {
+          "action": "db",
+          "as": "sibling",
+          "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, NULL, ?, NULL, ?, ?, ?, ?, 0, 'everyone')",
+          "params": ["ph-sib", "f-sib", "My drawing", "{{sibling}}", "Sibling", "2026-01-01T00:00:00Z"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, NULL, ?, NULL, ?, ?, ?, ?, 0, 'everyone')",
+          "params": ["ph-kid", "f-kid", "Selfie", "{{kid}}", "Kid", "2026-01-01T00:01:00Z"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id FROM app_photo_album__photos",
+          "expect": { "status": 200, "rowCount": 2 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "DELETE FROM app_photo_album__photos WHERE id = ?",
+          "params": ["ph-sib"]
+        },
+        {
+          "action": "db",
+          "as": "sibling",
+          "sql": "SELECT id FROM app_photo_album__photos WHERE id = 'ph-sib'",
+          "expect": { "status": 200, "rowCount": 1 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "DELETE FROM app_photo_album__photos WHERE id = ?",
+          "params": ["ph-kid"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "DELETE FROM app_photo_album__photos WHERE id = ?",
+          "params": ["ph-sib"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT id FROM app_photo_album__photos",
+          "expect": { "status": 200, "rowCount": 0 }
+        }
+      ]
+    },
+    {
+      "name": "a photo kept off 'everyone' is visible only to its uploader",
+      "members": { "uploader": "adult", "other": "adult" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, visibility) VALUES ('ph-pub', NULL, 'f1', 'Public', ?, 'U', '2026-01-01T00:00:00Z', 'everyone'), ('ph-priv', NULL, 'f2', 'Private', ?, 'U', '2026-01-01T00:00:00Z', 'private')",
+          "params": ["{{uploader}}", "{{uploader}}"]
+        },
+        {
+          "action": "db",
+          "as": "other",
+          "sql": "SELECT id FROM app_photo_album__photos",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "ph-pub" }] }
+        },
+        {
+          "action": "db",
+          "as": "uploader",
+          "sql": "SELECT id FROM app_photo_album__photos",
+          "expect": { "status": 200, "rowCount": 2 }
+        }
+      ]
+    },
+    {
+      "name": "deleting an album cascades to its photos but leaves unfiled photos",
+      "members": { "parent": "adult" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_photo_album__albums (id, name, created_by_id, created_by_name, created_at) VALUES ('a1', 'Trip', ?, 'Parent', '2026-01-01T00:00:00Z')",
+          "params": ["{{parent}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, uploaded_by_id, uploaded_by_name, uploaded_at) VALUES ('ph-in', 'a1', 'f1', ?, 'Parent', '2026-01-01T00:00:00Z'), ('ph-loose', NULL, 'f2', ?, 'Parent', '2026-01-01T00:00:00Z')",
+          "params": ["{{parent}}", "{{parent}}"]
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "DELETE FROM app_photo_album__albums WHERE id = ?",
+          "params": ["a1"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT id FROM app_photo_album__photos",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "ph-loose" }] }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT id FROM app_photo_album__albums",
+          "expect": { "status": 200, "rowCount": 0 }
+        }
+      ]
+    }
+  ]
+}
