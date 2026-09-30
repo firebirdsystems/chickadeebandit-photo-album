@@ -161,6 +161,71 @@
           "expect": { "status": 200, "rowCount": 0 }
         }
       ]
+    },
+    {
+      "name": "in a shared space a participant adult cannot recaption or delete another member's photo; the steward can",
+      "context": "shared_space",
+      "members": { "a": "adult", "b": "adult", "steward": "admin" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES ('ph-1', NULL, 'f-1', NULL, 'Beach', ?, 'A', '2026-01-01T00:00:00Z', 0, 'everyone'), ('ph-2', NULL, 'f-2', NULL, 'Picnic', ?, 'A', '2026-01-01T00:01:00Z', 1, 'everyone')",
+          "params": ["{{a}}", "{{a}}"]
+        },
+        {
+          "action": "db",
+          "as": "b",
+          "sql": "SELECT id FROM app_photo_album__photos ORDER BY id",
+          "params": [],
+          "expect": { "status": 200, "rowCount": 2 }
+        },
+        {
+          "action": "db",
+          "as": "b",
+          "sql": "UPDATE app_photo_album__photos SET caption = ? WHERE id = ?",
+          "params": ["defaced", "ph-1"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "b",
+          "sql": "DELETE FROM app_photo_album__photos WHERE id = ?",
+          "params": ["ph-2"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "SELECT id, caption FROM app_photo_album__photos ORDER BY id",
+          "params": [],
+          "expect": {
+            "status": 200,
+            "rowCount": 2,
+            "rowsContain": [{ "id": "ph-1", "caption": "Beach" }, { "id": "ph-2", "caption": "Picnic" }]
+          }
+        },
+        {
+          "action": "db",
+          "as": "steward",
+          "sql": "UPDATE app_photo_album__photos SET caption = ? WHERE id = ?",
+          "params": ["Beach day", "ph-1"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "steward",
+          "sql": "DELETE FROM app_photo_album__photos WHERE id = ?",
+          "params": ["ph-2"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "SELECT id, caption FROM app_photo_album__photos ORDER BY id",
+          "params": [],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "ph-1", "caption": "Beach day" }] }
+        }
+      ]
     }
   ]
 }
