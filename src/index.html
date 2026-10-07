@@ -214,7 +214,7 @@
 
     /* ── Empty / loading states ───────────────────────────────── */
     .empty-state { text-align: center; padding: 64px 20px; color: var(--muted); }
-    .empty-icon  { font-size: 3.5rem; margin-bottom: 10px; }
+    .empty-icon  { margin-bottom: 12px; }
     .empty-state h3 { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
     .empty-state p  { font-size: 0.875rem; }
     .empty-state .btn { margin-top: 18px; }
@@ -377,7 +377,7 @@
 
   <!-- Lightbox lives outside #app so it overlays everything -->
   <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
-    <button class="lb-fullscreen" id="lb-fullscreen" aria-label="View full screen" title="Full screen">⛶</button>
+    <button class="lb-fullscreen" id="lb-fullscreen" aria-label="View full screen" title="Full screen"></button>
     <button class="lb-close" id="lb-close" aria-label="Close">✕</button>
     <div class="lb-counter" id="lb-counter"></div>
     <div class="lb-stage">
@@ -394,7 +394,7 @@
   <div id="toasts"></div>
 
   <script type="module">
-    import { createDbHelper, createFilesHelper, createShareHelper, isAdult, esc, formatRelativeDate, searchMatch, hubAlert, hubConfirm, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS } from "/hub-sdk.js";
+    import { createDbHelper, createFilesHelper, createShareHelper, isAdult, esc, formatRelativeDate, searchMatch, hubAlert, hubConfirm, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS, glyph, chickadee } from "/hub-sdk.js";
     import {
       canDelete, canCreateAlbum, canUpload, canShare, gateAfterFailedMint,
       sortByDate, getCoverFileId, albumPhotoCount, searchableFields,
@@ -485,7 +485,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
 
       let html = `
         <div class="header">
-          <span class="header-title">📷 Family Photos</span>
+          <span class="header-title">${glyph("camera")} Family Photos</span>
           <div class="header-actions">
             ${canCreateAlbum(ME) ? `<button class="btn btn-primary" data-testid="new-album" onclick="openCreateAlbumModal()">+ New Album</button>` : ""}
           </div>
@@ -496,7 +496,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
 
       if (!DB_URL) {
         html += `<div class="empty-state">
-          <div class="empty-icon">📷</div>
+          <div class="empty-icon">${chickadee("perched")}</div>
           <h3>Demo mode</h3>
           <p>Install this app in your hub to upload and browse family photos.</p>
         </div>`;
@@ -532,7 +532,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
 
       if (albums.length === 0 && totalCount === 0) {
         html += `<div class="empty-state">
-          <div class="empty-icon">📸</div>
+          <div class="empty-icon">${chickadee("nest")}</div>
           <h3>No photos yet</h3>
           <p>Create an album or drop photos anywhere on this page to get started.</p>
         </div>`;
@@ -547,7 +547,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       const coverHtml = coverFileId && files
         ? `<img data-src="${esc(files.url(coverFileId))}" alt="${esc(name)}"
                onload="this.classList.add('loaded')" onerror="this.classList.add('load-error')" /><div class="shimmer"></div>`
-        : `<div class="album-placeholder${isAll ? " all" : ""}">${isAll ? "🖼️" : "📁"}</div>`;
+        : `<div class="album-placeholder${isAll ? " all" : ""}">${glyph(isAll ? "frame" : "folder")}</div>`;
 
       const countLabel = count === 1 ? "1 photo" : `${count} photos`;
       // Names the GATE, not reachability. `share_photos` says "include the
@@ -559,12 +559,12 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       // The Share dialog is the authoritative view of what is actually live.
       const gateBadge = (!isAll && shared)
         ? `<span class="shared-badge" data-testid="album-gate-badge"
-                 title="Photos are included when this album is shared. Open Share to see whether any link is live.">🔗 photo sharing on</span>`
+                 title="Photos are included when this album is shared. Open Share to see whether any link is live.">${glyph("link")} photo sharing on</span>`
         : "";
       const shareBtn = (!isAll && showShare)
         ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px"
                    data-testid="share-album" data-album-id="${esc(id)}"
-                   onclick="event.stopPropagation(); openShareModal(this.dataset.albumId)">🔗 Share</button>`
+                   onclick="event.stopPropagation(); openShareModal(this.dataset.albumId)">${glyph("link")} Share</button>`
         : "";
       const delBtn = (!isAll && canDel)
         ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px;color:#ef4444;border-color:#fecaca"
@@ -612,7 +612,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
           <span class="header-title">${esc(title)}</span>
           <div class="header-actions">
             ${showShare ? `<button class="btn btn-ghost" data-testid="share-album-current" data-album-id="${esc(currentAlbum.id)}"
-                                   onclick="openShareModal(this.dataset.albumId)">🔗 Share</button>` : ""}
+                                   onclick="openShareModal(this.dataset.albumId)">${glyph("link")} Share</button>` : ""}
             ${showUp ? `<button class="btn btn-primary" onclick="triggerFilePicker()">+ Upload</button>` : ""}
           </div>
         </div>
@@ -635,12 +635,12 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
 
       if (photos.length && shown.length === 0) {
         html += `<div class="empty-state">
-          <div class="empty-icon">🔍</div>
+          <div class="empty-icon">${chickadee("searching")}</div>
           <h3>No captions match "${esc(searchQ)}"</h3>
         </div>`;
       } else if (photos.length === 0) {
         html += `<div class="empty-state">
-          <div class="empty-icon">📷</div>
+          <div class="empty-icon">${chickadee("nest")}</div>
           <h3>No photos yet</h3>
           ${showUp ? `<p>Tap Upload or drop photos here to add the first one.</p>` : `<p>No photos in this album yet.</p>`}
           ${showUp ? `<button class="btn btn-primary" onclick="triggerFilePicker()">Upload photos</button>` : ""}
@@ -656,8 +656,8 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
                    onload="this.classList.add('loaded')" onerror="this.classList.add('load-error')" />
               <div class="shimmer"></div>
               <div class="photo-actions">
-                <button class="photo-action-btn" onclick="event.stopPropagation(); zoomPhoto(${idx})" aria-label="Zoom photo" title="Zoom">🔍</button>
-                ${showDel ? `<button class="photo-action-btn danger" data-photo-id="${esc(photo.id)}" data-file-id="${esc(photo.file_id)}" data-thumb-id="${esc(photo.thumb_file_id || "")}" onclick="event.stopPropagation(); confirmDeletePhoto(this.dataset.photoId, this.dataset.fileId, this.dataset.thumbId)" aria-label="Delete photo" title="Delete">✕</button>` : ""}
+                <button class="photo-action-btn" onclick="event.stopPropagation(); zoomPhoto(${idx})" aria-label="Zoom photo" title="Zoom">${glyph("magnifier", { accent: "currentColor" })}</button>
+                ${showDel ? `<button class="photo-action-btn danger" data-photo-id="${esc(photo.id)}" data-file-id="${esc(photo.file_id)}" data-thumb-id="${esc(photo.thumb_file_id || "")}" onclick="event.stopPropagation(); confirmDeletePhoto(this.dataset.photoId, this.dataset.fileId, this.dataset.thumbId)" aria-label="Delete photo" title="Delete">${glyph("close", { accent: "currentColor" })}</button>` : ""}
               </div>
             </div>`;
         });
@@ -928,7 +928,9 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
 
     // Click backdrop to close
     lbEl.addEventListener("click", e => { if (e.target === lbEl) closeLightbox(); });
+    document.getElementById("lb-close").innerHTML = glyph("close", { accent: "currentColor" });
     document.getElementById("lb-close").addEventListener("click", closeLightbox);
+    document.getElementById("lb-fullscreen").innerHTML = glyph("expand", { accent: "currentColor" });
     document.getElementById("lb-fullscreen").addEventListener("click", () => requestFullscreen(lbImg));
     lbPrev.addEventListener("click", () => lightboxNav(-1));
     lbNext.addEventListener("click", () => lightboxNav(1));
@@ -1108,7 +1110,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
           <input readonly value="${esc(l.url)}" onclick="this.select()" />
           <div class="link-meta">
             Expires ${esc(new Date(l.expiresAt).toLocaleDateString())} ·
-            ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${l.hasPassword ? " · 🔒 password" : ""}
+            ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${l.hasPassword ? ` · ${glyph("lock")} password` : ""}
           </div>
           <div class="link-actions">
             <button class="btn btn-ghost btn-sm" data-link-id="${esc(l.id)}"
@@ -1361,7 +1363,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       // Show loading skeleton while data fetches
       document.getElementById("app").innerHTML = `
         <div class="header">
-          <span class="header-title">📷 Family Photos</span>
+          <span class="header-title">${glyph("camera")} Family Photos</span>
         </div>
         <div class="loading-grid">
           ${Array.from({ length: 8 }, () => `<div class="loading-card"></div>`).join("")}
