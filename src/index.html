@@ -696,30 +696,6 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       if (fileList.length) uploadFiles(fileList);
     };
 
-    /* Resize an image client-side for use as a grid thumbnail.
-       Returns null if the image is already small enough that a separate thumbnail isn't worth it. */
-    function makeThumbnail(file, maxDim = 480, quality = 0.82) {
-      return new Promise((resolve, reject) => {
-        const url = URL.createObjectURL(file);
-        const img = new Image();
-        img.onload = () => {
-          URL.revokeObjectURL(url);
-          const scale = maxDim / Math.max(img.width, img.height);
-          if (scale >= 1) { resolve(null); return; }
-          const canvas = document.createElement("canvas");
-          canvas.width  = Math.round(img.width * scale);
-          canvas.height = Math.round(img.height * scale);
-          canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(
-            blob => blob ? resolve(blob) : reject(new Error("Thumbnail generation failed")),
-            "image/jpeg", quality
-          );
-        };
-        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not read image")); };
-        img.src = url;
-      });
-    }
-
     async function uploadFiles(fileList) {
       if (uploading || !files || !ME) return;
       uploading   = true;
@@ -729,19 +705,12 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
 
       for (const file of fileList) {
         try {
-          const { id: fileId } = await files.upload(file);
-
-          let thumbFileId = null;
-          try {
-            const thumbBlob = await makeThumbnail(file);
-            if (thumbBlob) {
-              const thumbName = `thumb-${file.name}`.replace(/\.[^.]+$/, "") + ".jpg";
-              const thumbFile = new File([thumbBlob], thumbName, { type: "image/jpeg" });
-              ({ id: thumbFileId } = await files.upload(thumbFile));
-            }
-          } catch {
-            // Fall back to using the original as the thumbnail source
-          }
+          // The grid's small copy is made here and kept by the hub with the photo. None
+          // comes back for a picture that is already small or that this browser
+          // cannot decode; the grid then draws the original.
+          const uploaded = await files.upload(file, { thumbnail: true });
+          const fileId = uploaded.id;
+          const thumbFileId = uploaded.thumbnailId ?? null;
 
           const photoId = crypto.randomUUID();
           const now     = new Date().toISOString();

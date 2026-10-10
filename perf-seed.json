@@ -1,0 +1,2343 @@
+{
+  "seed": [
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','-0 minutes'), ?)",
+      "params": [
+        "perf-album-01",
+        "Beach trip",
+        "A week at the coast.",
+        "{{partner}}",
+        "Jordan",
+        "on"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','-0 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-001",
+        "perf-album-01",
+        "perf-file-001",
+        "perf-thumb-001",
+        "The cake",
+        "{{partner}}",
+        "Jordan",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-9 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-002",
+        "perf-album-01",
+        "perf-file-002",
+        "perf-thumb-002",
+        "Tent is up",
+        "{{me}}",
+        "Alex",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','-18 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-003",
+        "perf-album-01",
+        "perf-file-003",
+        "perf-thumb-003",
+        "Grandma and the kids",
+        "{{child}}",
+        "Rowan",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','-27 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-004",
+        "perf-album-01",
+        "perf-file-004",
+        "perf-thumb-004",
+        "Paint day",
+        "{{partner}}",
+        "Jordan",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-36 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-005",
+        "perf-album-01",
+        "perf-file-005",
+        "perf-thumb-005",
+        "{{me}}",
+        "Alex",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','-45 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-006",
+        "perf-album-01",
+        "perf-file-006",
+        "perf-thumb-006",
+        "{{adult2}}",
+        "Sam",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','-54 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-007",
+        "perf-album-01",
+        "perf-file-007",
+        "perf-thumb-007",
+        "Sunset from the dunes",
+        "{{child2}}",
+        "Juniper",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-63 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-008",
+        "perf-album-01",
+        "perf-file-008",
+        "perf-thumb-008",
+        "Blowing out candles",
+        "{{me}}",
+        "Alex",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','-72 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-009",
+        "perf-album-01",
+        "perf-file-009",
+        "S'mores",
+        "{{partner}}",
+        "Jordan",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','-81 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-010",
+        "perf-album-01",
+        "perf-file-010",
+        "perf-thumb-010",
+        "Goal!",
+        "{{me}}",
+        "Alex",
+        9,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-90 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-011",
+        "perf-album-01",
+        "perf-file-011",
+        "perf-thumb-011",
+        "Fireworks",
+        "{{child}}",
+        "Rowan",
+        10,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','-99 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-012",
+        "perf-album-01",
+        "perf-file-012",
+        "perf-thumb-012",
+        "{{partner}}",
+        "Jordan",
+        11,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','-108 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-013",
+        "perf-album-01",
+        "perf-file-013",
+        "perf-thumb-013",
+        "{{me}}",
+        "Alex",
+        12,
+        "private"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-117 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-014",
+        "perf-album-01",
+        "perf-file-014",
+        "perf-thumb-014",
+        "Everyone squinting",
+        "{{adult2}}",
+        "Sam",
+        13,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','-126 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-015",
+        "perf-album-01",
+        "perf-file-015",
+        "perf-thumb-015",
+        "New backpack",
+        "{{child2}}",
+        "Juniper",
+        14,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','-135 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-016",
+        "perf-album-01",
+        "perf-file-016",
+        "perf-thumb-016",
+        "First tomato",
+        "{{me}}",
+        "Alex",
+        15,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-144 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-017",
+        "perf-album-01",
+        "perf-file-017",
+        "perf-thumb-017",
+        "Team photo",
+        "{{partner}}",
+        "Jordan",
+        16,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','-153 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-018",
+        "perf-album-01",
+        "perf-file-018",
+        "Muddy paws",
+        "{{me}}",
+        "Alex",
+        17,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','-162 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-019",
+        "perf-album-01",
+        "perf-file-019",
+        "perf-thumb-019",
+        "{{child}}",
+        "Rowan",
+        18,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-171 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-020",
+        "perf-album-01",
+        "perf-file-020",
+        "perf-thumb-020",
+        "Sandcastle",
+        "{{partner}}",
+        "Jordan",
+        19,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','-180 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-021",
+        "perf-album-01",
+        "perf-file-021",
+        "perf-thumb-021",
+        "The cake",
+        "{{me}}",
+        "Alex",
+        20,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','-189 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-022",
+        "perf-album-01",
+        "perf-file-022",
+        "perf-thumb-022",
+        "Tent is up",
+        "{{adult2}}",
+        "Sam",
+        21,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','-1 minutes'), ?)",
+      "params": [
+        "perf-album-02",
+        "Rowan's 8th birthday",
+        "Dinosaur cake and a bouncy castle.",
+        "{{me}}",
+        "Alex",
+        "off"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-29 days','-1 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-023",
+        "perf-album-02",
+        "perf-file-023",
+        "perf-thumb-023",
+        "Goal!",
+        "{{child2}}",
+        "Juniper",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','-10 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-024",
+        "perf-album-02",
+        "perf-file-024",
+        "perf-thumb-024",
+        "Fireworks",
+        "{{me}}",
+        "Alex",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','-19 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-025",
+        "perf-album-02",
+        "perf-file-025",
+        "perf-thumb-025",
+        "{{partner}}",
+        "Jordan",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-29 days','-28 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-026",
+        "perf-album-02",
+        "perf-file-026",
+        "perf-thumb-026",
+        "{{me}}",
+        "Alex",
+        3,
+        "private"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','-37 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-027",
+        "perf-album-02",
+        "perf-file-027",
+        "Everyone squinting",
+        "{{child}}",
+        "Rowan",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','-46 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-028",
+        "perf-album-02",
+        "perf-file-028",
+        "perf-thumb-028",
+        "New backpack",
+        "{{partner}}",
+        "Jordan",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-29 days','-55 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-029",
+        "perf-album-02",
+        "perf-file-029",
+        "perf-thumb-029",
+        "First tomato",
+        "{{me}}",
+        "Alex",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','-64 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-030",
+        "perf-album-02",
+        "perf-file-030",
+        "perf-thumb-030",
+        "Team photo",
+        "{{adult2}}",
+        "Sam",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','-73 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-031",
+        "perf-album-02",
+        "perf-file-031",
+        "perf-thumb-031",
+        "Muddy paws",
+        "{{child2}}",
+        "Juniper",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-29 days','-82 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-032",
+        "perf-album-02",
+        "perf-file-032",
+        "perf-thumb-032",
+        "{{me}}",
+        "Alex",
+        9,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','-91 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-033",
+        "perf-album-02",
+        "perf-file-033",
+        "perf-thumb-033",
+        "Sandcastle",
+        "{{partner}}",
+        "Jordan",
+        10,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','-100 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-034",
+        "perf-album-02",
+        "perf-file-034",
+        "perf-thumb-034",
+        "The cake",
+        "{{me}}",
+        "Alex",
+        11,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-29 days','-109 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-035",
+        "perf-album-02",
+        "perf-file-035",
+        "perf-thumb-035",
+        "Tent is up",
+        "{{child}}",
+        "Rowan",
+        12,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','-118 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-036",
+        "perf-album-02",
+        "perf-file-036",
+        "Grandma and the kids",
+        "{{partner}}",
+        "Jordan",
+        13,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','-127 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-037",
+        "perf-album-02",
+        "perf-file-037",
+        "perf-thumb-037",
+        "Paint day",
+        "{{me}}",
+        "Alex",
+        14,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-29 days','-136 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-038",
+        "perf-album-02",
+        "perf-file-038",
+        "perf-thumb-038",
+        "{{adult2}}",
+        "Sam",
+        15,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','-145 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-039",
+        "perf-album-02",
+        "perf-file-039",
+        "perf-thumb-039",
+        "{{child2}}",
+        "Juniper",
+        16,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','-154 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-040",
+        "perf-album-02",
+        "perf-file-040",
+        "perf-thumb-040",
+        "Sunset from the dunes",
+        "{{me}}",
+        "Alex",
+        17,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','-2 minutes'), ?)",
+      "params": [
+        "perf-album-03",
+        "First day of school",
+        "{{me}}",
+        "Alex",
+        "off"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-37 days','-2 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-041",
+        "perf-album-03",
+        "perf-file-041",
+        "perf-thumb-041",
+        "New backpack",
+        "{{partner}}",
+        "Jordan",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-36 days','-11 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-042",
+        "perf-album-03",
+        "perf-file-042",
+        "perf-thumb-042",
+        "First tomato",
+        "{{me}}",
+        "Alex",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-35 days','-20 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-043",
+        "perf-album-03",
+        "perf-file-043",
+        "perf-thumb-043",
+        "Team photo",
+        "{{child}}",
+        "Rowan",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-37 days','-29 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-044",
+        "perf-album-03",
+        "perf-file-044",
+        "perf-thumb-044",
+        "Muddy paws",
+        "{{partner}}",
+        "Jordan",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-36 days','-38 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-045",
+        "perf-album-03",
+        "perf-file-045",
+        "{{me}}",
+        "Alex",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-35 days','-47 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-046",
+        "perf-album-03",
+        "perf-file-046",
+        "perf-thumb-046",
+        "Sandcastle",
+        "{{adult2}}",
+        "Sam",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-37 days','-56 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-047",
+        "perf-album-03",
+        "perf-file-047",
+        "perf-thumb-047",
+        "The cake",
+        "{{child2}}",
+        "Juniper",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-36 days','-65 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-048",
+        "perf-album-03",
+        "perf-file-048",
+        "perf-thumb-048",
+        "Tent is up",
+        "{{me}}",
+        "Alex",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-62 days','-3 minutes'), ?)",
+      "params": [
+        "perf-album-04",
+        "Camping at the lake",
+        "Three nights, one raccoon.",
+        "{{partner}}",
+        "Jordan",
+        "on"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-61 days','-3 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-049",
+        "perf-album-04",
+        "perf-file-049",
+        "perf-thumb-049",
+        "Goal!",
+        "{{partner}}",
+        "Jordan",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','-12 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-050",
+        "perf-album-04",
+        "perf-file-050",
+        "perf-thumb-050",
+        "Fireworks",
+        "{{me}}",
+        "Alex",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-59 days','-21 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-051",
+        "perf-album-04",
+        "perf-file-051",
+        "perf-thumb-051",
+        "{{child}}",
+        "Rowan",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-61 days','-30 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-052",
+        "perf-album-04",
+        "perf-file-052",
+        "perf-thumb-052",
+        "{{partner}}",
+        "Jordan",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','-39 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-053",
+        "perf-album-04",
+        "perf-file-053",
+        "perf-thumb-053",
+        "Everyone squinting",
+        "{{me}}",
+        "Alex",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-59 days','-48 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-054",
+        "perf-album-04",
+        "perf-file-054",
+        "New backpack",
+        "{{adult2}}",
+        "Sam",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-61 days','-57 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-055",
+        "perf-album-04",
+        "perf-file-055",
+        "perf-thumb-055",
+        "First tomato",
+        "{{child2}}",
+        "Juniper",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','-66 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-056",
+        "perf-album-04",
+        "perf-file-056",
+        "perf-thumb-056",
+        "Team photo",
+        "{{me}}",
+        "Alex",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-59 days','-75 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-057",
+        "perf-album-04",
+        "perf-file-057",
+        "perf-thumb-057",
+        "Muddy paws",
+        "{{partner}}",
+        "Jordan",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-61 days','-84 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-058",
+        "perf-album-04",
+        "perf-file-058",
+        "perf-thumb-058",
+        "{{me}}",
+        "Alex",
+        9,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','-93 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-059",
+        "perf-album-04",
+        "perf-file-059",
+        "perf-thumb-059",
+        "Sandcastle",
+        "{{child}}",
+        "Rowan",
+        10,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-59 days','-102 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-060",
+        "perf-album-04",
+        "perf-file-060",
+        "perf-thumb-060",
+        "The cake",
+        "{{partner}}",
+        "Jordan",
+        11,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-61 days','-111 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-061",
+        "perf-album-04",
+        "perf-file-061",
+        "perf-thumb-061",
+        "Tent is up",
+        "{{me}}",
+        "Alex",
+        12,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','-120 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-062",
+        "perf-album-04",
+        "perf-file-062",
+        "perf-thumb-062",
+        "Grandma and the kids",
+        "{{adult2}}",
+        "Sam",
+        13,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-59 days','-129 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-063",
+        "perf-album-04",
+        "perf-file-063",
+        "Paint day",
+        "{{child2}}",
+        "Juniper",
+        14,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-61 days','-138 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-064",
+        "perf-album-04",
+        "perf-file-064",
+        "perf-thumb-064",
+        "{{me}}",
+        "Alex",
+        15,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','-147 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-065",
+        "perf-album-04",
+        "perf-file-065",
+        "perf-thumb-065",
+        "{{partner}}",
+        "Jordan",
+        16,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-59 days','-156 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-066",
+        "perf-album-04",
+        "perf-file-066",
+        "perf-thumb-066",
+        "Sunset from the dunes",
+        "{{me}}",
+        "Alex",
+        17,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-61 days','-165 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-067",
+        "perf-album-04",
+        "perf-file-067",
+        "perf-thumb-067",
+        "Blowing out candles",
+        "{{child}}",
+        "Rowan",
+        18,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','-174 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-068",
+        "perf-album-04",
+        "perf-file-068",
+        "perf-thumb-068",
+        "S'mores",
+        "{{partner}}",
+        "Jordan",
+        19,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-150 days','-4 minutes'), ?)",
+      "params": [
+        "perf-album-05",
+        "Garden 2026",
+        "From seedlings to tomatoes.",
+        "{{me}}",
+        "Alex",
+        "off"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-149 days','-4 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-069",
+        "perf-album-05",
+        "perf-file-069",
+        "perf-thumb-069",
+        "Team photo",
+        "{{me}}",
+        "Alex",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-148 days','-13 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-070",
+        "perf-album-05",
+        "perf-file-070",
+        "perf-thumb-070",
+        "Muddy paws",
+        "{{adult2}}",
+        "Sam",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-147 days','-22 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-071",
+        "perf-album-05",
+        "perf-file-071",
+        "perf-thumb-071",
+        "{{child2}}",
+        "Juniper",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-149 days','-31 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-072",
+        "perf-album-05",
+        "perf-file-072",
+        "Sandcastle",
+        "{{me}}",
+        "Alex",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-148 days','-40 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-073",
+        "perf-album-05",
+        "perf-file-073",
+        "perf-thumb-073",
+        "The cake",
+        "{{partner}}",
+        "Jordan",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-147 days','-49 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-074",
+        "perf-album-05",
+        "perf-file-074",
+        "perf-thumb-074",
+        "Tent is up",
+        "{{me}}",
+        "Alex",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-149 days','-58 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-075",
+        "perf-album-05",
+        "perf-file-075",
+        "perf-thumb-075",
+        "Grandma and the kids",
+        "{{child}}",
+        "Rowan",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-148 days','-67 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-076",
+        "perf-album-05",
+        "perf-file-076",
+        "perf-thumb-076",
+        "Paint day",
+        "{{partner}}",
+        "Jordan",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-147 days','-76 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-077",
+        "perf-album-05",
+        "perf-file-077",
+        "perf-thumb-077",
+        "{{me}}",
+        "Alex",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-149 days','-85 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-078",
+        "perf-album-05",
+        "perf-file-078",
+        "perf-thumb-078",
+        "{{adult2}}",
+        "Sam",
+        9,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-148 days','-94 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-079",
+        "perf-album-05",
+        "perf-file-079",
+        "perf-thumb-079",
+        "Sunset from the dunes",
+        "{{child2}}",
+        "Juniper",
+        10,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-147 days','-103 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-080",
+        "perf-album-05",
+        "perf-file-080",
+        "perf-thumb-080",
+        "Blowing out candles",
+        "{{me}}",
+        "Alex",
+        11,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-149 days','-112 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-081",
+        "perf-album-05",
+        "perf-file-081",
+        "S'mores",
+        "{{partner}}",
+        "Jordan",
+        12,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-148 days','-121 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-082",
+        "perf-album-05",
+        "perf-file-082",
+        "perf-thumb-082",
+        "Goal!",
+        "{{me}}",
+        "Alex",
+        13,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-147 days','-130 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-083",
+        "perf-album-05",
+        "perf-file-083",
+        "perf-thumb-083",
+        "Fireworks",
+        "{{child}}",
+        "Rowan",
+        14,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-149 days','-139 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-084",
+        "perf-album-05",
+        "perf-file-084",
+        "perf-thumb-084",
+        "{{partner}}",
+        "Jordan",
+        15,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-85 days','-5 minutes'), ?)",
+      "params": [
+        "perf-album-06",
+        "Grandma's visit",
+        "{{me}}",
+        "Alex",
+        "off"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','-5 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-085",
+        "perf-album-06",
+        "perf-file-085",
+        "perf-thumb-085",
+        "Sandcastle",
+        "{{me}}",
+        "Alex",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-83 days','-14 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-086",
+        "perf-album-06",
+        "perf-file-086",
+        "perf-thumb-086",
+        "The cake",
+        "{{adult2}}",
+        "Sam",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-82 days','-23 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-087",
+        "perf-album-06",
+        "perf-file-087",
+        "perf-thumb-087",
+        "Tent is up",
+        "{{child2}}",
+        "Juniper",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','-32 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-088",
+        "perf-album-06",
+        "perf-file-088",
+        "perf-thumb-088",
+        "Grandma and the kids",
+        "{{me}}",
+        "Alex",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-83 days','-41 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-089",
+        "perf-album-06",
+        "perf-file-089",
+        "perf-thumb-089",
+        "Paint day",
+        "{{partner}}",
+        "Jordan",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-82 days','-50 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-090",
+        "perf-album-06",
+        "perf-file-090",
+        "{{me}}",
+        "Alex",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','-59 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-091",
+        "perf-album-06",
+        "perf-file-091",
+        "perf-thumb-091",
+        "{{child}}",
+        "Rowan",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-83 days','-68 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-092",
+        "perf-album-06",
+        "perf-file-092",
+        "perf-thumb-092",
+        "Sunset from the dunes",
+        "{{partner}}",
+        "Jordan",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-82 days','-77 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-093",
+        "perf-album-06",
+        "perf-file-093",
+        "perf-thumb-093",
+        "Blowing out candles",
+        "{{me}}",
+        "Alex",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','-86 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-094",
+        "perf-album-06",
+        "perf-file-094",
+        "perf-thumb-094",
+        "S'mores",
+        "{{adult2}}",
+        "Sam",
+        9,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-83 days','-95 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-095",
+        "perf-album-06",
+        "perf-file-095",
+        "perf-thumb-095",
+        "Goal!",
+        "{{child2}}",
+        "Juniper",
+        10,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-82 days','-104 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-096",
+        "perf-album-06",
+        "perf-file-096",
+        "perf-thumb-096",
+        "Fireworks",
+        "{{me}}",
+        "Alex",
+        11,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-110 days','-6 minutes'), ?)",
+      "params": [
+        "perf-album-07",
+        "Soccer season",
+        "Go Comets.",
+        "{{partner}}",
+        "Jordan",
+        "on"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-109 days','-6 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-097",
+        "perf-album-07",
+        "perf-file-097",
+        "perf-thumb-097",
+        "{{partner}}",
+        "Jordan",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-108 days','-15 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-098",
+        "perf-album-07",
+        "perf-file-098",
+        "perf-thumb-098",
+        "Sandcastle",
+        "{{me}}",
+        "Alex",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-107 days','-24 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-099",
+        "perf-album-07",
+        "perf-file-099",
+        "The cake",
+        "{{child}}",
+        "Rowan",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-109 days','-33 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-100",
+        "perf-album-07",
+        "perf-file-100",
+        "perf-thumb-100",
+        "Tent is up",
+        "{{partner}}",
+        "Jordan",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-108 days','-42 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-101",
+        "perf-album-07",
+        "perf-file-101",
+        "perf-thumb-101",
+        "Grandma and the kids",
+        "{{me}}",
+        "Alex",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-107 days','-51 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-102",
+        "perf-album-07",
+        "perf-file-102",
+        "perf-thumb-102",
+        "Paint day",
+        "{{adult2}}",
+        "Sam",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-109 days','-60 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-103",
+        "perf-album-07",
+        "perf-file-103",
+        "perf-thumb-103",
+        "{{child2}}",
+        "Juniper",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-108 days','-69 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-104",
+        "perf-album-07",
+        "perf-file-104",
+        "perf-thumb-104",
+        "{{me}}",
+        "Alex",
+        7,
+        "private"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-107 days','-78 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-105",
+        "perf-album-07",
+        "perf-file-105",
+        "perf-thumb-105",
+        "Sunset from the dunes",
+        "{{partner}}",
+        "Jordan",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-109 days','-87 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-106",
+        "perf-album-07",
+        "perf-file-106",
+        "perf-thumb-106",
+        "Blowing out candles",
+        "{{me}}",
+        "Alex",
+        9,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-108 days','-96 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-107",
+        "perf-album-07",
+        "perf-file-107",
+        "perf-thumb-107",
+        "S'mores",
+        "{{child}}",
+        "Rowan",
+        10,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-107 days','-105 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-108",
+        "perf-album-07",
+        "perf-file-108",
+        "Goal!",
+        "{{partner}}",
+        "Jordan",
+        11,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-109 days','-114 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-109",
+        "perf-album-07",
+        "perf-file-109",
+        "perf-thumb-109",
+        "Fireworks",
+        "{{me}}",
+        "Alex",
+        12,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-108 days','-123 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-110",
+        "perf-album-07",
+        "perf-file-110",
+        "perf-thumb-110",
+        "{{adult2}}",
+        "Sam",
+        13,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-140 days','-7 minutes'), ?)",
+      "params": [
+        "perf-album-08",
+        "House projects",
+        "Before and after.",
+        "{{me}}",
+        "Alex",
+        "off"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-139 days','-7 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-111",
+        "perf-album-08",
+        "perf-file-111",
+        "perf-thumb-111",
+        "Sandcastle",
+        "{{child2}}",
+        "Juniper",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-138 days','-16 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-112",
+        "perf-album-08",
+        "perf-file-112",
+        "perf-thumb-112",
+        "The cake",
+        "{{me}}",
+        "Alex",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-137 days','-25 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-113",
+        "perf-album-08",
+        "perf-file-113",
+        "perf-thumb-113",
+        "Tent is up",
+        "{{partner}}",
+        "Jordan",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-139 days','-34 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-114",
+        "perf-album-08",
+        "perf-file-114",
+        "perf-thumb-114",
+        "Grandma and the kids",
+        "{{me}}",
+        "Alex",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-138 days','-43 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-115",
+        "perf-album-08",
+        "perf-file-115",
+        "perf-thumb-115",
+        "Paint day",
+        "{{child}}",
+        "Rowan",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-137 days','-52 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-116",
+        "perf-album-08",
+        "perf-file-116",
+        "perf-thumb-116",
+        "{{partner}}",
+        "Jordan",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-139 days','-61 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-117",
+        "perf-album-08",
+        "perf-file-117",
+        "{{me}}",
+        "Alex",
+        6,
+        "private"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-138 days','-70 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-118",
+        "perf-album-08",
+        "perf-file-118",
+        "perf-thumb-118",
+        "Sunset from the dunes",
+        "{{adult2}}",
+        "Sam",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-137 days','-79 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-119",
+        "perf-album-08",
+        "perf-file-119",
+        "perf-thumb-119",
+        "Blowing out candles",
+        "{{child2}}",
+        "Juniper",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','-8 minutes'), ?)",
+      "params": [
+        "perf-album-09",
+        "Juniper's art",
+        "Fridge-worthy.",
+        "{{me}}",
+        "Alex",
+        "off"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','-8 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-120",
+        "perf-album-09",
+        "perf-file-120",
+        "perf-thumb-120",
+        "First tomato",
+        "{{me}}",
+        "Alex",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-93 days','-17 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-121",
+        "perf-album-09",
+        "perf-file-121",
+        "perf-thumb-121",
+        "Team photo",
+        "{{partner}}",
+        "Jordan",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-92 days','-26 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-122",
+        "perf-album-09",
+        "perf-file-122",
+        "perf-thumb-122",
+        "Muddy paws",
+        "{{me}}",
+        "Alex",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','-35 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-123",
+        "perf-album-09",
+        "perf-file-123",
+        "perf-thumb-123",
+        "{{child}}",
+        "Rowan",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-93 days','-44 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-124",
+        "perf-album-09",
+        "perf-file-124",
+        "perf-thumb-124",
+        "Sandcastle",
+        "{{partner}}",
+        "Jordan",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-92 days','-53 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-125",
+        "perf-album-09",
+        "perf-file-125",
+        "perf-thumb-125",
+        "The cake",
+        "{{me}}",
+        "Alex",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','-62 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-126",
+        "perf-album-09",
+        "perf-file-126",
+        "Tent is up",
+        "{{adult2}}",
+        "Sam",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-93 days','-71 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-127",
+        "perf-album-09",
+        "perf-file-127",
+        "perf-thumb-127",
+        "Grandma and the kids",
+        "{{child2}}",
+        "Juniper",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-92 days','-80 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-128",
+        "perf-album-09",
+        "perf-file-128",
+        "perf-thumb-128",
+        "Paint day",
+        "{{me}}",
+        "Alex",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','-89 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-129",
+        "perf-album-09",
+        "perf-file-129",
+        "perf-thumb-129",
+        "{{partner}}",
+        "Jordan",
+        9,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-97 days','-9 minutes'), ?)",
+      "params": [
+        "perf-album-10",
+        "Fourth of July",
+        "{{partner}}",
+        "Jordan",
+        "off"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-96 days','-9 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-130",
+        "perf-album-10",
+        "perf-file-130",
+        "perf-thumb-130",
+        "{{me}}",
+        "Alex",
+        0,
+        "private"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','-18 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-131",
+        "perf-album-10",
+        "perf-file-131",
+        "perf-thumb-131",
+        "Everyone squinting",
+        "{{child}}",
+        "Rowan",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','-27 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-132",
+        "perf-album-10",
+        "perf-file-132",
+        "perf-thumb-132",
+        "New backpack",
+        "{{partner}}",
+        "Jordan",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-96 days','-36 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-133",
+        "perf-album-10",
+        "perf-file-133",
+        "perf-thumb-133",
+        "First tomato",
+        "{{me}}",
+        "Alex",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','-45 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-134",
+        "perf-album-10",
+        "perf-file-134",
+        "perf-thumb-134",
+        "Team photo",
+        "{{adult2}}",
+        "Sam",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','-54 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-135",
+        "perf-album-10",
+        "perf-file-135",
+        "Muddy paws",
+        "{{child2}}",
+        "Juniper",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-96 days','-63 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-136",
+        "perf-album-10",
+        "perf-file-136",
+        "perf-thumb-136",
+        "{{me}}",
+        "Alex",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','-72 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-137",
+        "perf-album-10",
+        "perf-file-137",
+        "perf-thumb-137",
+        "Sandcastle",
+        "{{partner}}",
+        "Jordan",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','-81 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-138",
+        "perf-album-10",
+        "perf-file-138",
+        "perf-thumb-138",
+        "The cake",
+        "{{me}}",
+        "Alex",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-160 days','-10 minutes'), ?)",
+      "params": [
+        "perf-album-11",
+        "Biscuit",
+        "The dog gets his own album.",
+        "{{me}}",
+        "Alex",
+        "off"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','-10 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-139",
+        "perf-album-11",
+        "perf-file-139",
+        "perf-thumb-139",
+        "S'mores",
+        "{{child}}",
+        "Rowan",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','-19 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-140",
+        "perf-album-11",
+        "perf-file-140",
+        "perf-thumb-140",
+        "Goal!",
+        "{{partner}}",
+        "Jordan",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','-28 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-141",
+        "perf-album-11",
+        "perf-file-141",
+        "perf-thumb-141",
+        "Fireworks",
+        "{{me}}",
+        "Alex",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','-37 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-142",
+        "perf-album-11",
+        "perf-file-142",
+        "perf-thumb-142",
+        "{{adult2}}",
+        "Sam",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','-46 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-143",
+        "perf-album-11",
+        "perf-file-143",
+        "perf-thumb-143",
+        "{{child2}}",
+        "Juniper",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-157 days','-55 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-144",
+        "perf-album-11",
+        "perf-file-144",
+        "Everyone squinting",
+        "{{me}}",
+        "Alex",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-159 days','-64 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-145",
+        "perf-album-11",
+        "perf-file-145",
+        "perf-thumb-145",
+        "New backpack",
+        "{{partner}}",
+        "Jordan",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__albums (id, name, description, created_by_id, created_by_name, created_at, share_photos) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-170 days','-11 minutes'), ?)",
+      "params": [
+        "perf-album-12",
+        "Winter holidays 2025",
+        "Lights, snow, cousins.",
+        "{{me}}",
+        "Alex",
+        "off"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-30 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-146",
+        "perf-file-146",
+        "perf-thumb-146",
+        "Everyone squinting",
+        "{{me}}",
+        "Alex",
+        0,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','-71 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-147",
+        "perf-file-147",
+        "perf-thumb-147",
+        "Grandma and the kids",
+        "{{child}}",
+        "Rowan",
+        1,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','-112 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-148",
+        "perf-file-148",
+        "perf-thumb-148",
+        "{{partner}}",
+        "Jordan",
+        2,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','-153 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-149",
+        "perf-file-149",
+        "perf-thumb-149",
+        "The cake",
+        "{{me}}",
+        "Alex",
+        3,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-8 days','-194 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-150",
+        "perf-file-150",
+        "perf-thumb-150",
+        "Goal!",
+        "{{adult2}}",
+        "Sam",
+        4,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','-235 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-151",
+        "perf-file-151",
+        "perf-thumb-151",
+        "{{child2}}",
+        "Juniper",
+        5,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','-276 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-152",
+        "perf-file-152",
+        "perf-thumb-152",
+        "Blowing out candles",
+        "{{me}}",
+        "Alex",
+        6,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days','-317 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-153",
+        "perf-file-153",
+        "perf-thumb-153",
+        "Team photo",
+        "{{partner}}",
+        "Jordan",
+        7,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','-358 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-154",
+        "perf-file-154",
+        "perf-thumb-154",
+        "{{me}}",
+        "Alex",
+        8,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-18 days','-399 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-155",
+        "perf-file-155",
+        "perf-thumb-155",
+        "New backpack",
+        "{{child}}",
+        "Rowan",
+        9,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-20 days','-440 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-156",
+        "perf-file-156",
+        "perf-thumb-156",
+        "Paint day",
+        "{{partner}}",
+        "Jordan",
+        10,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-22 days','-481 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-157",
+        "perf-file-157",
+        "perf-thumb-157",
+        "{{me}}",
+        "Alex",
+        11,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','-522 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-158",
+        "perf-file-158",
+        "perf-thumb-158",
+        "Tent is up",
+        "{{adult2}}",
+        "Sam",
+        12,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-26 days','-563 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-159",
+        "perf-file-159",
+        "perf-thumb-159",
+        "Fireworks",
+        "{{child2}}",
+        "Juniper",
+        13,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','-604 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-160",
+        "perf-file-160",
+        "perf-thumb-160",
+        "Sandcastle",
+        "{{me}}",
+        "Alex",
+        14,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','-645 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-161",
+        "perf-file-161",
+        "perf-thumb-161",
+        "S'mores",
+        "{{partner}}",
+        "Jordan",
+        15,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-32 days','-686 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-162",
+        "perf-file-162",
+        "perf-thumb-162",
+        "Muddy paws",
+        "{{me}}",
+        "Alex",
+        16,
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_photo_album__photos (id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','-727 minutes'), ?, ?)",
+      "params": [
+        "perf-photo-163",
+        "perf-file-163",
+        "perf-thumb-163",
+        "Sunset from the dunes",
+        "{{child}}",
+        "Rowan",
+        17,
+        "everyone"
+      ]
+    }
+  ]
+}
