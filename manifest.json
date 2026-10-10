@@ -2,7 +2,7 @@
   "id": "photo-album",
   "name": "Family Photos",
   "version": "1.3.0",
-  "description": "A private shared photo gallery for the household. Upload photos, create named albums, and browse memories together. Adults can manage albums and delete; everyone can upload and browse.",
+  "description": "A private shared photo gallery for the household. Upload photos, create named albums, and browse memories together. Adults manage albums; everyone can upload and browse, and delete a photo they added.",
   "entrypoint": "index.html",
   "runtime": "static",
   "storage": "db",

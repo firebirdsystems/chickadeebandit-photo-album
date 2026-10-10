@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import {
   canDelete,
+  supervisesPhotos,
+  canDeleteAlbum,
   canCreateAlbum,
   canUpload,
   sortByDate,
@@ -8,12 +10,61 @@ import {
   albumPhotoCount, searchableFields, canShare, gateAfterFailedMint,
 } from "../src/logic.js";
 
+describe("supervisesPhotos", () => {
+  const adult = { id: "a1", role: "adult" };
+  it("every adult at home", () => expect(supervisesPhotos(adult)).toBe(true));
+  it("admins at home", () => expect(supervisesPhotos({ id: "a2", role: "admin" })).toBe(true));
+  it("not a child", () => expect(supervisesPhotos({ id: "c1", role: "child" })).toBe(false));
+  it("not null", () => expect(supervisesPhotos(null)).toBe(false));
+  it("not a space participant", () =>
+    expect(supervisesPhotos(adult, { tenantKind: "shared_space", isAdmin: false })).toBe(false));
+  it("the space steward", () =>
+    expect(supervisesPhotos(adult, { tenantKind: "shared_space", isAdmin: true })).toBe(true));
+  it("a co-parenting steward", () =>
+    expect(supervisesPhotos(adult, { tenantKind: "shared_space", spaceKind: "coparenting", isAdmin: true })).toBe(true));
+});
+
 describe("canDelete", () => {
-  it("allows adults",  () => expect(canDelete({ role: "adult" })).toBe(true));
-  it("allows admins",  () => expect(canDelete({ role: "admin" })).toBe(true));
-  it("blocks children", () => expect(canDelete({ role: "child" })).toBe(false));
-  it("blocks null",    () => expect(canDelete(null)).toBe(false));
-  it("blocks undefined", () => expect(canDelete(undefined)).toBe(false));
+  const adult = { id: "a1", role: "adult" };
+  const child = { id: "c1", role: "child" };
+  const mine = { id: "p1", uploaded_by_id: "a1" };
+  const theirs = { id: "p2", uploaded_by_id: "a2" };
+  const participant = { tenantKind: "shared_space", isAdmin: false };
+  const steward = { tenantKind: "shared_space", isAdmin: true };
+
+  it("lets a household adult delete anyone's photo", () => {
+    expect(canDelete(mine, adult)).toBe(true);
+    expect(canDelete(theirs, adult)).toBe(true);
+  });
+  it("lets a child delete only their own photo", () => {
+    expect(canDelete({ id: "p3", uploaded_by_id: "c1" }, child)).toBe(true);
+    expect(canDelete(theirs, child)).toBe(false);
+  });
+  it("lets a space participant delete only their own photo", () => {
+    expect(canDelete(mine, adult, participant)).toBe(true);
+    expect(canDelete(theirs, adult, participant)).toBe(false);
+  });
+  it("lets the space steward delete anyone's photo", () =>
+    expect(canDelete(theirs, adult, steward)).toBe(true));
+  it("blocks null and undefined members", () => {
+    expect(canDelete(mine, null)).toBe(false);
+    expect(canDelete(mine, undefined)).toBe(false);
+  });
+});
+
+describe("canDeleteAlbum", () => {
+  const participant = { tenantKind: "shared_space", isAdmin: false };
+  const steward = { tenantKind: "shared_space", isAdmin: true };
+  it("allows adults",   () => expect(canDeleteAlbum({ role: "adult" })).toBe(true));
+  it("allows admins",   () => expect(canDeleteAlbum({ role: "admin" })).toBe(true));
+  it("blocks children", () => expect(canDeleteAlbum({ role: "child" })).toBe(false));
+  it("blocks null",     () => expect(canDeleteAlbum(null)).toBe(false));
+  it("blocks a space participant, whose delete would take other members' photos", () =>
+    expect(canDeleteAlbum({ role: "adult" }, participant)).toBe(false));
+  it("allows the space steward", () =>
+    expect(canDeleteAlbum({ role: "adult" }, steward)).toBe(true));
+  it("blocks a child even where the page says they are the admin", () =>
+    expect(canDeleteAlbum({ role: "child" }, steward)).toBe(false));
 });
 
 describe("canCreateAlbum", () => {

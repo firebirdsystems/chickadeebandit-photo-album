@@ -394,9 +394,9 @@
   <div id="toasts"></div>
 
   <script type="module">
-    import { createDbHelper, createFilesHelper, createShareHelper, isAdult, esc, formatRelativeDate, searchMatch, hubAlert, hubConfirm, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS, glyph, chickadee } from "/hub-sdk.js";
+    import { createDbHelper, createFilesHelper, createShareHelper, esc, formatRelativeDate, searchMatch, hubAlert, hubConfirm, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS, glyph, chickadee } from "/hub-sdk.js";
     import {
-      canDelete, canCreateAlbum, canUpload, canShare, gateAfterFailedMint,
+      canDelete, canDeleteAlbum, canCreateAlbum, canUpload, canShare, gateAfterFailedMint,
       sortByDate, getCoverFileId, albumPhotoCount, searchableFields,
     } from "./logic.js";
 
@@ -405,7 +405,10 @@
     const DB_URL    = window.__DB_URL        ?? "";
     const FILES_URL = window.__FILES_URL     ?? "";
     const ME        = window.__CURRENT_MEMBER ?? null;
-    const ADULT     = isAdult(ME);
+    // Where the app is running: the hub lets every adult at home delete other
+    // members' photos, and only the steward in a shared space. An album takes
+    // its photos with it, so deleting one is offered to the same people.
+    const TENANT    = { tenantKind: window.__TENANT_KIND ?? "household", isAdmin: window.__IS_ADMIN === true };
 
     const db    = DB_URL    ? createDbHelper(DB_URL)       : async () => ({ rows: [] });
     const files = FILES_URL ? createFilesHelper(FILES_URL) : null;
@@ -522,7 +525,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
           coverFileId: getCoverFileId(allPhotos, a.id),
           count: albumPhotoCount(allPhotos, a.id),
           isAll: false,
-          canDel: canDelete(ME),
+          canDel: canDeleteAlbum(ME, TENANT),
           canShare: canShare(ME, share.enabled),
           shared: a.share_photos === "on",
         });
@@ -601,7 +604,6 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
     /* ─── Album / photo grid view ─────────────────────────────── */
     function renderAlbum() {
       const title   = currentAlbum ? currentAlbum.name : "All Photos";
-      const showDel = canDelete(ME);
       const showUp  = canUpload(ME, !!FILES_URL);
       // "All Photos" is a view, not a row — there is nothing for a link to point at.
       const showShare = !!currentAlbum && canShare(ME, share.enabled);
@@ -657,7 +659,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
               <div class="shimmer"></div>
               <div class="photo-actions">
                 <button class="photo-action-btn" onclick="event.stopPropagation(); zoomPhoto(${idx})" aria-label="Zoom photo" title="Zoom">${glyph("magnifier", { accent: "currentColor" })}</button>
-                ${showDel ? `<button class="photo-action-btn danger" data-photo-id="${esc(photo.id)}" data-file-id="${esc(photo.file_id)}" data-thumb-id="${esc(photo.thumb_file_id || "")}" onclick="event.stopPropagation(); confirmDeletePhoto(this.dataset.photoId, this.dataset.fileId, this.dataset.thumbId)" aria-label="Delete photo" title="Delete">${glyph("close", { accent: "currentColor" })}</button>` : ""}
+                ${canDelete(photo, ME, TENANT) ? `<button class="photo-action-btn danger" data-photo-id="${esc(photo.id)}" data-file-id="${esc(photo.file_id)}" data-thumb-id="${esc(photo.thumb_file_id || "")}" onclick="event.stopPropagation(); confirmDeletePhoto(this.dataset.photoId, this.dataset.fileId, this.dataset.thumbId)" aria-label="Delete photo" title="Delete">${glyph("close", { accent: "currentColor" })}</button>` : ""}
               </div>
             </div>`;
         });
@@ -994,7 +996,22 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         // the ALBUM is deleted, and this is a direct delete of the child, so
         // this lane was still leaking through two un-awaited files.delete()
         // calls while the album lane was covered.
-        await db("DELETE FROM app_photo_album__photos WHERE id = ?", [photoId]);
+        const { changed } = await db("DELETE FROM app_photo_album__photos WHERE id = ?", [photoId]);
+        // The hub answers 200 with nothing changed when the photo is not this
+        // member's to delete, and also when somebody else deleted it first. The
+        // photos are read again to tell the two apart: one still there stays on
+        // screen and they are told, one that is gone leaves the page.
+        if (changed === 0) {
+          await loadData();
+          if (currentAlbum) currentAlbum = albums.find(a => a.id === currentAlbum.id) ?? null;
+          const gone = !allPhotos.some(p => p.id === photoId);
+          loadPhotosForView();
+          closeModal();
+          if (lbEl.classList.contains("open")) closeLightbox();
+          render();
+          toast(gone ? "This photo was already deleted" : "This photo could not be deleted", !gone);
+          return;
+        }
         allPhotos = allPhotos.filter(p => p.id !== photoId);
         loadPhotosForView();
         closeModal();

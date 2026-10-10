@@ -1,5 +1,32 @@
-export function canDelete(member) {
+// The hub's own test for an adult member (hub-sdk `isAdult`), repeated here so
+// the role rules below can be unit-tested without the browser-only SDK.
+function isAdultMember(member) {
   return !!member && (member.role === "adult" || member.role === "admin");
+}
+
+/**
+ * Whether a member may delete a photo someone else uploaded. Mirrors the hub's
+ * rule for the photos table (owner_or_visibility): any adult in a household,
+ * and only the steward in a shared space. An adult who merely takes part in a
+ * space is narrowed to their own uploads, so a delete of anyone else's photo
+ * would change nothing.
+ */
+export function supervisesPhotos(member, { tenantKind = "household", isAdmin = false } = {}) {
+  return tenantKind === "household" ? isAdultMember(member) : isAdmin === true;
+}
+
+/** A photo's own uploader may always delete it; so may whoever supervises photos. */
+export function canDelete(photo, member, tenant) {
+  return !!member && (photo.uploaded_by_id === member.id || supervisesPhotos(member, tenant));
+}
+
+/**
+ * Deleting an album deletes every photo in it, other members' included, so it
+ * is offered to an adult who may delete those photos one by one: every adult
+ * in a household, and only the steward in a shared space.
+ */
+export function canDeleteAlbum(member, tenant) {
+  return isAdultMember(member) && supervisesPhotos(member, tenant);
 }
 
 export function canCreateAlbum(member) {
