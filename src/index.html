@@ -1301,7 +1301,8 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       try {
         await share.revoke(linkId);
       } catch (err) {
-        hubAlert("Couldn't revoke link", { description: err.message });
+        console.error("[photo-album] link not revoked", err);
+        hubAlert("Couldn’t revoke the link — try again.");
         return;
       }
 
