@@ -188,12 +188,12 @@
     @keyframes shimmer { to { background-position: -200% 0; } }
 
     /* Image failed to decode (e.g. HEIC in browsers that can't display it) */
-    img.load-error + .shimmer {
+    img.img-error + .shimmer {
       animation: none; opacity: 1; pointer-events: none;
       background: var(--bg);
       display: flex; align-items: center; justify-content: center;
     }
-    img.load-error + .shimmer::after { content: "🖼️"; font-size: 1.6rem; opacity: 0.3; }
+    img.img-error + .shimmer::after { content: "🖼️"; font-size: 1.6rem; opacity: 0.3; }
 
     /* Action buttons appear on hover */
     .photo-actions {
@@ -213,6 +213,8 @@
     .photo-action-btn.danger:hover { background: rgba(239,68,68,0.85); }
 
     /* ── Empty / loading states ───────────────────────────────── */
+    .load-error { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--hub-tint-danger, #fee2e2); color: var(--hub-tint-danger-fg, #b91c1c); font-size: 0.9rem; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .load-error-retry { background: none; border: 1px solid currentColor; border-radius: 8px; padding: 5px 10px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; flex-shrink: 0; }
     .empty-state { text-align: center; padding: 64px 20px; color: var(--muted); }
     .empty-icon  { margin-bottom: 12px; }
     .empty-state h3 { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
@@ -445,6 +447,8 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
     }, { rootMargin: "400px 0px" });
 
     /* ─── Data loading ────────────────────────────────────────── */
+    // Set when the first load failed, so the page says so instead of "No photos yet".
+    let loadFailed = false;
     async function loadData() {
       const [{ rows: alb }, { rows: pho }] = await Promise.all([
         db("SELECT id, name, description, created_by_id, created_by_name, created_at, share_photos FROM app_photo_album__albums ORDER BY created_at DESC"),
@@ -490,7 +494,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         <div class="header">
           <span class="header-title">${glyph("camera")} Family Photos</span>
           <div class="header-actions">
-            ${canCreateAlbum(ME) ? `<button class="btn btn-primary" data-testid="new-album" onclick="openCreateAlbumModal()">+ New Album</button>` : ""}
+            ${canCreateAlbum(ME) && !loadFailed ? `<button class="btn btn-primary" data-testid="new-album" onclick="openCreateAlbumModal()">+ New Album</button>` : ""}
           </div>
         </div>
       `;
@@ -503,6 +507,12 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
           <h3>Demo mode</h3>
           <p>Install this app in your hub to upload and browse family photos.</p>
         </div>`;
+        document.getElementById("app").innerHTML = html;
+        return;
+      }
+
+      if (loadFailed) {
+        html += `<div class="load-error" data-testid="load-error" role="alert"><span>Couldn’t load your photos.</span> <button type="button" class="load-error-retry" data-testid="load-retry" onclick="retryLoad()">Try again</button></div>`;
         document.getElementById("app").innerHTML = html;
         return;
       }
@@ -549,7 +559,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
     function albumCardHTML({ id, name, coverFileId, count, isAll, canDel, canShare: showShare, shared }) {
       const coverHtml = coverFileId && files
         ? `<img data-src="${esc(files.url(coverFileId))}" alt="${esc(name)}"
-               onload="this.classList.add('loaded')" onerror="this.classList.add('load-error')" /><div class="shimmer"></div>`
+               onload="this.classList.add('loaded')" onerror="this.classList.add('img-error')" /><div class="shimmer"></div>`
         : `<div class="album-placeholder${isAll ? " all" : ""}">${glyph(isAll ? "frame" : "folder")}</div>`;
 
       const countLabel = count === 1 ? "1 photo" : `${count} photos`;
@@ -655,7 +665,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
             <div class="photo-card" data-testid="photo-card" data-photo-id="${esc(photo.id)}" data-idx="${idx}" onclick="openLightbox(${idx})" role="button" tabindex="0"
                  onkeydown="if(event.key==='Enter'||event.key===' ')openLightbox(${idx})">
               <img data-src="${esc(src)}" alt="${esc(photo.caption || "Photo")}"
-                   onload="this.classList.add('loaded')" onerror="this.classList.add('load-error')" />
+                   onload="this.classList.add('loaded')" onerror="this.classList.add('img-error')" />
               <div class="shimmer"></div>
               <div class="photo-actions">
                 <button class="photo-action-btn" onclick="event.stopPropagation(); zoomPhoto(${idx})" aria-label="Zoom photo" title="Zoom">${glyph("magnifier", { accent: "currentColor" })}</button>
@@ -761,7 +771,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       e.preventDefault();
       dragCounter = 0;
       dropOverlay.classList.remove("active");
-      if (!canUpload(ME, !!FILES_URL)) return;
+      if (!canUpload(ME, !!FILES_URL) || loadFailed) return;
       const fileList = [...(e.dataTransfer?.files ?? [])].filter(f => f.type.startsWith("image/"));
       if (fileList.length) uploadFiles(fileList);
     });
@@ -842,7 +852,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
 
       setLightboxZoom(1);
       lbImg.style.display = "";
-      lbImg.classList.remove("load-error");
+      lbImg.classList.remove("img-error");
       lbImg.classList.add("fading");
 
       const caption = photo.caption ? `<div class="lb-caption">${esc(photo.caption)}</div>` : "";
@@ -859,7 +869,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       };
       img.onerror = () => {
         lbImg.classList.remove("fading");
-        lbImg.classList.add("load-error");
+        lbImg.classList.add("img-error");
         lbImg.style.display = "none";
         lbInfo.innerHTML = caption
           + `<div class="lb-meta" style="color:#f87171">This photo can't be displayed in this browser (unsupported format, e.g. HEIC).</div>`
@@ -1345,7 +1355,7 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
     }
 
     /* ─── Init ────────────────────────────────────────────────── */
-    (async () => {
+    async function firstLoad() {
       // Show loading skeleton while data fetches
       document.getElementById("app").innerHTML = `
         <div class="header">
@@ -1355,10 +1365,13 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
           ${Array.from({ length: 8 }, () => `<div class="loading-card"></div>`).join("")}
         </div>`;
 
-      await loadData();
+      try { await loadData(); loadFailed = false; }
+      catch { loadFailed = true; }
       loadPhotosForView();
       render();
-    })();
+    }
+    window.retryLoad = firstLoad;
+    firstLoad();
   </script>
 </body>
 </html>
