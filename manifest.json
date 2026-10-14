@@ -55,11 +55,8 @@
       ]
     }
   },
-  "delete_file_columns": {
-    "photos": [
-      "file_id",
-      "thumb_file_id"
-    ]
+  "file_columns": {
+    "photos": { "columns": ["file_id", "thumb_file_id"] }
   },
   "delete_cascades": {
     "albums": [
@@ -105,7 +102,6 @@
     "requires_approval": false
   },
   "resource_limits": {
-    "max_db_bytes": 52428800,
     "max_file_bytes": 20971520,
     "max_files_bytes": 5368709120
   },
