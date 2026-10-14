@@ -399,7 +399,7 @@
     import { createDbHelper, createFilesHelper, createShareHelper, esc, formatRelativeDate, searchMatch, hubAlert, hubConfirm, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS, glyph, chickadee } from "/hub-sdk.js";
     import {
       canDelete, canDeleteAlbum, canCreateAlbum, canUpload, canShare, gateAfterFailedMint,
-      sortByDate, getCoverFileId, albumPhotoCount, searchableFields,
+      sortByDate, getCoverFileId, albumPhotoCount, searchableFields, shareFailureLine,
     } from "./logic.js";
 
     /* ─── Runtime globals ─────────────────────────────────────── */
@@ -1092,11 +1092,13 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
 
     function sharePhotosOn(album) { return album?.share_photos === "on"; }
 
-    async function renderShareModal(albumId) {
+    async function renderShareModal(albumId, { afterWrite = false } = {}) {
       const album = albums.find(a => a.id === albumId);
       if (!album) return;
 
       const status  = await share.listAll();
+      // A refused list read comes back EMPTY (`limits: null`); after a write that must not draw as "none".
+      if (afterWrite && status.limits === null) throw new Error("Share links could not be re-read");
       shareLinks    = status.links;
       shareEntitled = status.entitled;
       const active  = activeLinksFor(albumId);
@@ -1209,6 +1211,8 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       const hours = Number(modalEl?.querySelector("#share-expiry")?.value) || undefined;
       const password = modalEl?.querySelector("#share-password")?.value?.trim() || undefined;
       const wantPhotos = !!modalEl?.querySelector("#share-photos")?.checked;
+      // The hub refuses a short password; say so here rather than as a failure to retry.
+      if (password && password.length < 6) { hubAlert("The password needs at least 6 characters."); return; }
       const btn = modalEl?.querySelector("#share-create");
       const restore = () => { if (btn) { btn.disabled = false; btn.textContent = "Create link"; } };
       if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
@@ -1260,18 +1264,20 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         const box = modalEl?.querySelector("#share-photos");
         if (box) box.checked = sharePhotosOn(albums.find(a => a.id === albumId));
         render();
-        hubAlert("Couldn't create share link", {
-          description: flipped
-            ? `${err.message} Photo sharing is off for this album — if a link was created before the connection dropped, reopen Share to see it.`
-            : err.message,
-        });
+        console.error("[photo-album] link not created", err);
+        const line = err?.status === 402 && (password || hours > 720)
+          ? "Links with a password or a longer expiry need an active plan."
+          : shareFailureLine(err, { action: "create the share link", thing: "album" });
+        hubAlert(line, flipped ? {
+          description: "Photo sharing is off for this album — if a link was created before the connection dropped, reopen Share to see it.",
+        } : undefined);
         return;
       }
 
       // Past this point the link is live and the gate stands as chosen.
       try { await navigator.clipboard.writeText(link.url); toast("Link copied"); } catch { /* the list shows it */ }
       try {
-        await renderShareModal(albumId);
+        await renderShareModal(albumId, { afterWrite: true });
       } catch {
         // The link exists — say so rather than reporting a failure that did
         // not happen. Reopening Share re-reads the list.
@@ -1302,18 +1308,26 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         await share.revoke(linkId);
       } catch (err) {
         console.error("[photo-album] link not revoked", err);
-        hubAlert("Couldn’t revoke the link — try again.");
-        return;
+        // A 404 is a link the hub no longer has: done; the refresh below drops it.
+        if (err?.status !== 404) {
+          hubAlert(shareFailureLine(err, { action: "revoke the link", thing: "album" }));
+          return;
+        }
       }
 
       shareLinks = shareLinks.filter(l => l.id !== linkId);
       try {
-        await renderShareModal(albumId);
+        await renderShareModal(albumId, { afterWrite: true });
       } catch {
         // The dialog on screen still lists the revoked link, and it can't be
         // re-read right now — close it rather than leave a stale list standing.
         closeModal();
         toast("Link revoked");
+        return;
+      }
+      // The hub's 404 also covers another member's link it would not let this one revoke.
+      if (activeShareLinks(shareLinks, albumId).some(l => l.id === linkId)) {
+        hubAlert("You don’t have permission to revoke the link.");
       }
     };
 

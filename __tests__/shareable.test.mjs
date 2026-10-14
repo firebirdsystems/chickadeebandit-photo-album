@@ -53,11 +53,11 @@ describe("shareable.album.feed", () => {
   });
 
   it("publishes a file column the reclaim lane tracks", () => {
-    // A published file id that delete_file_columns does not name would keep
+    // A published file id that file_columns does not name would keep
     // its bytes billed after the row is gone — and keep them reachable
     // through the link until the metadata row is swept.
     expect(columnsOf(feed.table).has(feed.files_column)).toBe(true);
-    expect(manifest.delete_file_columns[feed.table]).toContain(feed.files_column);
+    expect(manifest.file_columns[feed.table].columns).toContain(feed.files_column);
   });
 
   it("filters and orders on plaintext columns only", () => {
