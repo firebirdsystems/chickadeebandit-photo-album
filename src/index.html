@@ -399,7 +399,8 @@
     import { createDbHelper, createFilesHelper, createShareHelper, esc, formatRelativeDate, searchMatch, hubAlert, hubConfirm, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS, glyph, chickadee } from "/hub-sdk.js";
     import {
       canDelete, canDeleteAlbum, canCreateAlbum, canUpload, canShare, gateAfterFailedMint,
-      sortByDate, getCoverFileId, albumPhotoCount, searchableFields, shareFailureLine,
+      sortByDate, getCoverFileId, albumPhotoCount, searchableFields, shareFailureLine, outcomeUnknown,
+      failureLine, uploadFailureLine,
     } from "./logic.js";
 
     /* ─── Runtime globals ─────────────────────────────────────── */
@@ -708,6 +709,9 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       if (fileList.length) uploadFiles(fileList);
     };
 
+    // Files whose photo's answer was lost, by album and file: { photoId, uploaded }.
+    const unheardPhotos = new Map();
+
     async function uploadFiles(fileList) {
       if (uploading || !files || !ME) return;
       uploading   = true;
@@ -716,33 +720,60 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       render();
 
       for (const file of fileList) {
+        // A file whose photo's answer was lost on an earlier try is picked
+        // again: its upload and photo id are reused, so a photo that did land
+        // is found under that id rather than stored a second time.
+        const key = [currentAlbum?.id ?? "", file.name, file.size, file.type, file.lastModified].join("|");
+        const pinned = unheardPhotos.get(key);
+        let uploaded = pinned?.uploaded ?? null;
         try {
           // The grid's small copy is made here and kept by the hub with the photo. None
           // comes back for a picture that is already small or that this browser
           // cannot decode; the grid then draws the original.
-          const uploaded = await files.upload(file, { thumbnail: true });
+          uploaded ??= await files.upload(file, { thumbnail: true });
           const fileId = uploaded.id;
           const thumbFileId = uploaded.thumbnailId ?? null;
 
-          const photoId = crypto.randomUUID();
+          const photoId = pinned?.photoId ?? crypto.randomUUID();
           const now     = new Date().toISOString();
-          await db(
-            `INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'everyone')`,
-            [photoId, currentAlbum?.id ?? null, fileId, thumbFileId, "", ME.id, ME.name, now, 0]
-          );
-          allPhotos.unshift({
+          let row = {
             id: photoId, album_id: currentAlbum?.id ?? null,
             file_id: fileId, thumb_file_id: thumbFileId, caption: "",
             uploaded_by_id: ME.id, uploaded_by_name: ME.name,
             uploaded_at: now,
-          });
+          };
+          try {
+            await db(
+              `INSERT INTO app_photo_album__photos (id, album_id, file_id, thumb_file_id, caption, uploaded_by_id, uploaded_by_name, uploaded_at, sort_order, visibility)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'everyone')`,
+              [photoId, row.album_id, fileId, thumbFileId, "", ME.id, ME.name, now, 0]
+            );
+          } catch (err) {
+            // Refused: no photo names the upload, so it is discarded — unless an
+            // earlier try with it went unanswered: a photo that try stored may
+            // name it, so it is kept (and stays pinned) and never deleted.
+            if (!outcomeUnknown(err)) {
+              if (!pinned) files.delete(fileId).catch(() => {});
+              throw err;
+            }
+            // The answer was lost: read the photo back by its id. Found, it
+            // landed. Not found, or the read failed: the upload and id are kept
+            // for the next try at this file, and the file is never deleted.
+            unheardPhotos.set(key, { photoId, uploaded });
+            let stored = null;
+            // The id is ours: a failed read leaves the outcome unknown, so the
+            // generic line shows, never "already exists".
+            try { stored = (await db("SELECT * FROM app_photo_album__photos WHERE id = ?", [photoId])).rows?.[0] ?? null; }
+            catch (readErr) { console.error(readErr); throw new Error("photo read-back failed", { cause: err }); }
+            if (!stored) throw err;
+            console.error(err);
+            row = stored;
+          }
+          unheardPhotos.delete(key);
+          if (!allPhotos.some((p) => p.id === row.id)) allPhotos.unshift(row);
         } catch (err) {
-          const msg = err?.status === 413 ? "File too large"
-                    : err?.status === 415 ? "Unsupported file type"
-                    : err?.status === 507 ? "Storage full"
-                    : "Upload failed";
-          toast(msg, true);
+          console.error(err);
+          toast(uploadFailureLine(err, { action: "upload the photo", thing: "photo" }), true);
         }
         uploadDone++;
         if (uploading) render();
@@ -975,9 +1006,10 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         closeModal();
         render();
         toast("Album created");
-      } catch {
+      } catch (e) {
+        console.error(e);
         if (btn) { btn.disabled = false; btn.textContent = "Create"; }
-        toast("Failed to create album", true);
+        toast(failureLine(e, { action: "create the album", thing: "album" }), true);
       }
     };
 
@@ -1012,14 +1044,19 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         // photos are read again to tell the two apart: one still there stays on
         // screen and they are told, one that is gone leaves the page.
         if (changed === 0) {
-          await loadData();
-          if (currentAlbum) currentAlbum = albums.find(a => a.id === currentAlbum.id) ?? null;
-          const gone = !allPhotos.some(p => p.id === photoId);
+          // Still there: the row policy kept this member's delete from it.
+          // Gone: removed. Unread: the usual retry line.
+          let found = null;
+          try {
+            await loadData();
+            if (currentAlbum) currentAlbum = albums.find(a => a.id === currentAlbum.id) ?? null;
+            found = allPhotos.some(p => p.id === photoId);
+          } catch (readErr) { console.error(readErr); }
           loadPhotosForView();
           closeModal();
           if (lbEl.classList.contains("open")) closeLightbox();
           render();
-          toast(gone ? "This photo was already deleted" : "This photo could not be deleted", !gone);
+          toast(failureLine(null, { action: "delete the photo", thing: "photo", found }), found !== false);
           return;
         }
         allPhotos = allPhotos.filter(p => p.id !== photoId);
@@ -1028,9 +1065,10 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         if (lbEl.classList.contains("open")) closeLightbox();
         render();
         toast("Photo deleted");
-      } catch {
+      } catch (e) {
+        console.error(e);
         if (btn) { btn.disabled = false; btn.textContent = "Delete"; }
-        toast("Failed to delete photo", true);
+        toast(failureLine(e, { action: "delete the photo", thing: "photo" }), true);
       }
     };
 
@@ -1062,15 +1100,32 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
         // do that — it only ever named the photos THIS tab had loaded, so a
         // photo another member uploaded since would outlive its album, invisible
         // to every view and billed forever.
-        await db("DELETE FROM app_photo_album__albums WHERE id = ?", [albumId]);
+        const { changed } = await db("DELETE FROM app_photo_album__albums WHERE id = ?", [albumId]);
+        // Nothing deleted: re-read. Still there, the row policy kept this
+        // member's delete from it; gone, someone removed it first; unread, the
+        // usual retry line. Either way the page shows what is stored.
+        if (changed === 0) {
+          let found = null;
+          try {
+            await loadData();
+            found = albums.some(a => a.id === albumId);
+            if (currentAlbum) currentAlbum = albums.find(a => a.id === currentAlbum.id) ?? null;
+          } catch (readErr) { console.error(readErr); }
+          loadPhotosForView();
+          closeModal();
+          render();
+          toast(failureLine(null, { action: "delete the album", thing: "album", found }), found !== false);
+          return;
+        }
         albums    = albums.filter(a => a.id !== albumId);
         allPhotos = allPhotos.filter(p => p.album_id !== albumId);
         closeModal();
         render();
         toast("Album deleted");
-      } catch {
+      } catch (e) {
+        console.error(e);
         if (btn) { btn.disabled = false; btn.textContent = "Delete"; }
-        toast("Failed to delete album", true);
+        toast(failureLine(e, { action: "delete the album", thing: "album" }), true);
       }
     };
 
@@ -1187,7 +1242,15 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
      *  privacy state the database never took — and `createShare` would go on
      *  to mint a link against the old value. */
     async function writeSharePhotos(albumId, value) {
-      await db("UPDATE app_photo_album__albums SET share_photos = ? WHERE id = ?", [value, albumId]);
+      const { changed } = await db("UPDATE app_photo_album__albums SET share_photos = ? WHERE id = ?", [value, albumId]);
+      // Nothing changed: the setting did not save. Re-read to say why (gone,
+      // or the row policy kept this member's write from it); unread, unknown.
+      if (changed === 0) {
+        let found = null;
+        try { found = !!(await db("SELECT id FROM app_photo_album__albums WHERE id = ?", [albumId])).rows?.[0]; }
+        catch (readErr) { console.error(readErr); }
+        throw Object.assign(new Error(failureLine(null, { action: "change photo sharing", thing: "album", found })), { forUser: true });
+      }
       const album = albums.find(a => a.id === albumId);
       if (album) album.share_photos = value;
       const note = modalEl?.querySelector("#share-note");
@@ -1199,10 +1262,11 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
     window.setSharePhotos = async function(albumId, checked) {
       try {
         await writeSharePhotos(albumId, checked ? "on" : "off");
-      } catch {
+      } catch (e) {
+        console.error(e);
         const box = modalEl?.querySelector("#share-photos");
         if (box) box.checked = sharePhotosOn(albums.find(a => a.id === albumId));
-        toast("Couldn't change photo sharing", true);
+        toast(failureLine(e, { action: "change photo sharing", thing: "album" }), true);
       }
     };
 
@@ -1226,12 +1290,16 @@ let searchQ = "";       // in-app search (see logic.js searchableFields)
       if (flipped) {
         try {
           await writeSharePhotos(albumId, wantPhotos ? "on" : "off");
-        } catch {
+        } catch (e) {
+          console.error(e);
           restore();
           const box = modalEl?.querySelector("#share-photos");
           if (box) box.checked = wasOn;
+          // A refusal is said as one; only a lost or failed answer asks for a retry.
           hubAlert("Couldn't create share link", {
-            description: "The album's photo-sharing setting could not be saved, so no link was created. Try again.",
+            description: !e?.forUser && outcomeUnknown(e)
+              ? "The album's photo-sharing setting could not be saved, so no link was created. Try again."
+              : `${failureLine(e, { action: "change photo sharing", thing: "album" })} No link was created.`,
           });
           return;
         }

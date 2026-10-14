@@ -15,6 +15,9 @@ describe("shareFailureLine", () => {
     expect(shareFailureLine(err({ status: 404 }, "Item not found"), words))
       .toBe("This album has been removed.");
   });
+  it("asks for a wait on a rate limit", () => {
+    expect(shareFailureLine(err({ status: 429 }), words)).toBe("Too many tries — wait a minute and try again.");
+  });
   it("asks for a retry only when retrying can work", () => {
     for (const e of [err({}), err({ status: 400 }), err({ status: 409 }), err({ status: 500 }), err({ status: 503 }), new TypeError("Failed to fetch"), undefined]) {
       expect(shareFailureLine(e, { action: "revoke the share link", thing: "album" }))
